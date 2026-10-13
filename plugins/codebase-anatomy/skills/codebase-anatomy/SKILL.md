@@ -95,11 +95,29 @@ Sort by severity. Also collect the "done well" list with the same evidence stand
 Design tensions (a rule that contradicts the product's promise) belong here too — they are
 often the most valuable finding and never appear in linters.
 
+## Where the output lives
+
+The result is an **Artifact** (a private claude.ai page). The source file and the link are kept in one
+folder per project, shared by all three skills (code-reader · project-haeseolseo · codebase-anatomy):
+
+```
+~/.claude/study-my-code/<project>/
+  links.json      artifact URL · title · source file of each result — look here first when updating
+  code-reader/    code-reader workspace
+  haeseolseo/     haeseolseo.html  interview guide source
+  anatomy/        anatomy.html     this skill's source
+```
+
+- `<project>` is the repository folder name in lowercase-with-hyphens (e.g. `todo-app`). If the folder already exists, reuse its name.
+- Never write into the repository being analyzed. Don't keep the source only in the session scratchpad — it disappears with the session.
+- After publishing, fill only this skill's entry: `"anatomy": { "url", "title", "file": "anatomy/anatomy.html" }`. Leave the others alone.
+- When updating, check `links.json` for the URL first; fall back to `Artifact action:"list"` only if it is missing.
+
 ### Phase 5 — Write
 
 Chapter structure and required content per chapter: `references/chapters.md`.
 Which interactive component to reach for and why: `references/interactions.md`.
-Copy `assets/kit.html` and fill its data arrays — it carries the design system and twelve
+Copy `assets/kit.html` to `~/.claude/study-my-code/<project>/anatomy/anatomy.html` and fill its data arrays — it carries the design system and twelve
 tested components. How to use it: `references/kit-usage.md`. Do not rewrite the CSS/JS;
 it is already verified for light/dark/system themes, mobile, and partial-failure safety.
 
@@ -139,18 +157,18 @@ destroys the document's only real asset — its trustworthiness.
 ### Phase 7 — Publish
 
 Load `artifact-design` per its own trigger rules, then publish with the `Artifact` tool.
-Hand the user the URL and a summary of what the investigation actually found —
+Record the URL in `links.json` (`anatomy`). Hand the user the URL and a summary of what the investigation actually found —
 lead with the discoveries, not the feature list.
 
 ## Updating an existing anatomy
 
-If one already exists for the project (`Artifact action:"list"`), read it and build on it —
+If one already exists for the project (`links.json`, else `Artifact action:"list"`), read it and build on it —
 same URL, same `--key`, same section ids. Read marks, fix marks and quiz answers live in the
 reader's localStorage under that key; a new URL or key silently drops them.
 
 **Screen-only refresh** (content unchanged):
 1. `Artifact action:"read"`, then read the saved file to the last line.
-2. `node ${CLAUDE_SKILL_DIR}/scripts/upgrade.js <saved file> <work file>` — strips the publish
+2. `node ${CLAUDE_SKILL_DIR}/scripts/upgrade.js <saved file> <project folder>/anatomy/anatomy.html` — strips the publish
    wrapper and injects (or swaps in the latest) shell. Running it again is safe.
 3. `check.js` + `shot.js`, confirm the chapters and data block are unchanged from the original,
    then publish to the same URL. A share link pinned to an older version keeps showing that

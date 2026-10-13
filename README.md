@@ -35,6 +35,24 @@ AI 와 같이 만든 프로젝트는 돌아가긴 하는데, "이 줄이 왜 있
 
 세 스킬 모두 **저장소를 고치지 않고**, 근거(파일:줄)를 달고, 비밀 값(API 키 · 토큰)은 싣지 않아요. 설명은 한국어예요(해부도는 요청한 언어).
 
+## 결과물은 어디 생기나요?
+
+**결과물은 Claude 의 Artifact 예요.** 스킬을 쓴 사람의 claude.ai 계정에 페이지가 하나 생기고, 처음에는 본인만 볼 수 있어요(공유는 직접 정해요). 이 저장소나 분석한 프로젝트 저장소에는 아무것도 생기지 않아요.
+
+페이지의 원본 파일과 링크는 내 컴퓨터의 **프로젝트마다 폴더 하나**에 모여요. 세 스킬이 같은 폴더를 함께 써요.
+
+```
+~/.claude/study-my-code/<프로젝트>/
+  links.json      세 결과물의 Artifact 주소 — 다음에 "업데이트해줘" 하면 여기서 찾아요
+  code-reader/    코드 리더 작업 폴더 (줄 해설 · 사전 · 흐름 · 기록표)
+  haeseolseo/     해설서 원본 HTML
+  anatomy/        해부도 원본 HTML
+```
+
+- **다시 만들면 같은 주소로 갱신돼요.** 읽음 · 체크 · 퀴즈 기록은 그 주소에 묶여 브라우저에 저장되기 때문에, 새 페이지를 만들지 않고 같은 주소를 이어 써요.
+- 이 폴더는 저장소 밖이라 실수로 커밋될 일이 없고, 세션이 끝나도 남아요.
+- 예전 버전의 code-reader 는 `~/.claude/code-reader/<프로젝트>/` 를 썼어요. 거기 작업 폴더가 있으면 새 위치로 복사해서 이어 쓰고, 옛 폴더는 지우지 않아요.
+
 ## 설치
 
 Claude Code 에서:
@@ -78,7 +96,7 @@ Claude Code 에서:
 
 **코드가 바뀌면?** 해설은 줄 번호가 아니라 **덩어리 지문**(코드 내용의 해시)에 묶여 있어요. `update.js` 가 지난 빌드와 지금 코드를 줄 단위로 맞춰서, 내용이 같은 덩어리는 줄 번호만 옮기고, 바뀐 덩어리만 "다시 쓰기" 목록에 올려요. 페이지에서는 바뀐 덩어리만 다시 "안 읽음"이 되고 "지난번 이후 바뀐 곳"에 모여요.
 
-작업 데이터(해설 · 사전 · 기록표)는 저장소가 아니라 `~/.claude/code-reader/<프로젝트>/` 에 쌓여요. 예시는 [`plugins/code-reader/skills/code-reader/example/`](plugins/code-reader/skills/code-reader/example) — 아주 작은 할 일 앱과 그 작업 폴더예요. 직접 만들어 보려면:
+작업 데이터(해설 · 사전 · 기록표)는 저장소가 아니라 `~/.claude/study-my-code/<프로젝트>/code-reader/` 에 쌓여요. 예시는 [`plugins/code-reader/skills/code-reader/example/`](plugins/code-reader/skills/code-reader/example) — 아주 작은 할 일 앱과 그 작업 폴더예요. 직접 만들어 보려면:
 
 ```bash
 cd plugins/code-reader/skills/code-reader

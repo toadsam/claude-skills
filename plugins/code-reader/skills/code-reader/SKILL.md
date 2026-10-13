@@ -13,7 +13,7 @@ description: Build (or incrementally update) a Korean "코드 리더" interactiv
 ## 구성
 
 - **엔진** (이 스킬 폴더 `engine/`, 프로젝트와 무관): `template.html`(페이지 전체), `build.js`, `update.js`, `check.js`, `checktour.js`, `outline.js`, `smoke.js`, `shot.js`, `lib.js`
-- **작업 폴더** (프로젝트마다 하나, `~/.claude/code-reader/<이름>/`): 저장소 밖, 세션이 끝나도 남는다. **저장소 안에는 아무것도 쓰지 않는다.**
+- **작업 폴더** (프로젝트마다 하나, `~/.claude/study-my-code/<프로젝트>/code-reader/` — 아래 「결과물이 남는 곳」): 저장소 밖, 세션이 끝나도 남는다. **저장소 안에는 아무것도 쓰지 않는다.**
 
 ```
 <작업폴더>/
@@ -32,6 +32,25 @@ description: Build (or incrementally update) a Korean "코드 리더" interactiv
 명령은 모두 `node <스킬>/engine/<스크립트> <작업폴더> …` 꼴이다. 여기와 참고 문서의 `<스킬>` 은 이 SKILL.md 가 있는 폴더 `${CLAUDE_SKILL_DIR}` 이다
 (플러그인이 아니라 `~/.claude/skills/code-reader/` 에 직접 두었다면 그 경로). Node.js 18 이상이 필요하다.
 `config.repo` 는 절대 경로나 작업 폴더 기준 상대 경로로 쓴다.
+
+## 결과물이 남는 곳
+
+결과물은 **Artifact**(claude.ai 의 비공개 페이지)다. 원본 파일과 링크는 프로젝트마다 폴더 하나에 모은다.
+code-reader · project-haeseolseo · codebase-anatomy 세 스킬이 같은 폴더를 함께 쓴다.
+
+```
+~/.claude/study-my-code/<프로젝트>/
+  links.json      세 결과물의 아티팩트 URL · 제목 · 원본 파일 — 갱신할 때 여기서 먼저 찾는다
+  code-reader/    코드 리더 작업 폴더
+  haeseolseo/     haeseolseo.html  해설서 원본
+  anatomy/        anatomy.html     해부도 원본
+```
+
+- `<프로젝트>` 는 저장소 폴더 이름을 소문자 · 하이픈으로 바꾼 것(예: `todo-app`). 폴더가 이미 있으면 그 이름을 그대로 쓴다.
+- 분석하는 저장소 안에는 아무것도 쓰지 않는다. 세션 임시 폴더(scratchpad)에도 원본을 두지 않는다 — 세션이 끝나면 사라진다.
+- 발행하면 `links.json` 의 자기 칸만 채운다: `"code-reader": { "url", "title" }`. 다른 칸은 건드리지 않는다.
+- 갱신할 때는 `links.json` 의 URL 부터 보고, 없을 때만 `Artifact action:"list"` 로 찾는다.
+- 예전 위치 `~/.claude/code-reader/<이름>/` 에만 작업 폴더가 있으면 새 위치로 **복사**해서 쓴다. 옛 폴더는 지우지 않는다(지울지는 사용자에게 묻는다).
 
 ## 먼저 정할 것: 처음 만들기인가, 업데이트인가
 
@@ -57,7 +76,7 @@ description: Build (or incrementally update) a Korean "코드 리더" interactiv
 5. `node build.js <ws> --allow-missing` → `node outline.js <ws>` 로 흐름별 덩어리 목록을 만들고, 그걸 보며 **따라가기 이야기**를 쓴다 (§3). `node checktour.js <ws>`.
 6. **평가 · 지도**: `review.json`(§5), `map-*.json`(§6), `config.ui.arch` 구조 그림(§7). 모두 근거(file · lines)를 단다. 성적표 · effort 는 "제 판단"임을 페이지가 밝힌다.
 7. **검사**: `check.js <ws> --all` → `build.js <ws>` → `checktour.js <ws>` → `smoke.js <ws>` → `shot.js <ws> <이름> "<JS>"` 로 각 탭을 찍어 눈으로 본다(예: `'rHub=true;showTab("read")'`, `'mxSec="arch";showTab("map")'`). 비밀 패턴 grep 0건.
-8. **올리기**: `Artifact` 로 `out/code-reader.html` 을 publish. 스크린샷 같은 파일은 `config.publishFiles` 를 `files` 로 같이 보낸다. 받은 URL 을 `config.artifactUrl` 에 적어 둔다. 메모리에도 작업 폴더 위치와 URL 을 남긴다.
+8. **올리기**: `Artifact` 로 `out/code-reader.html` 을 publish. 스크린샷 같은 파일은 `config.publishFiles` 를 `files` 로 같이 보낸다. 받은 URL 을 `config.artifactUrl` 과 `../links.json` 의 `code-reader` 칸에 적어 둔다. 메모리에도 작업 폴더 위치와 URL 을 남긴다.
 
 ## B. 업데이트 (코드가 조금 바뀌었을 때)
 

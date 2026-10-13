@@ -71,10 +71,28 @@ description: Build a Korean interview-prep "해설서" for one of the user's own
 - 포트폴리오 · 이력서의 숫자와 코드 조각을 저장소와 대조해 어긋나는 곳을 목록으로 만든다. 사용자에게 보고하고,
   고치라고 하면 고친다(`references/sources.md` 「포트폴리오 고치기」).
 
+## 결과물이 남는 곳
+
+결과물은 **Artifact**(claude.ai 의 비공개 페이지)다. 원본 파일과 링크는 프로젝트마다 폴더 하나에 모은다.
+code-reader · project-haeseolseo · codebase-anatomy 세 스킬이 같은 폴더를 함께 쓴다.
+
+```
+~/.claude/study-my-code/<프로젝트>/
+  links.json      세 결과물의 아티팩트 URL · 제목 · 원본 파일 — 갱신할 때 여기서 먼저 찾는다
+  code-reader/    코드 리더 작업 폴더
+  haeseolseo/     haeseolseo.html  해설서 원본
+  anatomy/        anatomy.html     해부도 원본
+```
+
+- `<프로젝트>` 는 저장소 폴더 이름을 소문자 · 하이픈으로 바꾼 것(예: `todo-app`). 폴더가 이미 있으면 그 이름을 그대로 쓴다.
+- 분석하는 저장소 안에는 아무것도 쓰지 않는다. 세션 임시 폴더(scratchpad)에도 원본을 두지 않는다 — 세션이 끝나면 사라진다.
+- 발행하면 `links.json` 의 자기 칸만 채운다: `"haeseolseo": { "url", "title", "file": "haeseolseo/haeseolseo.html" }`. 다른 칸은 건드리지 않는다.
+- 갱신할 때는 `links.json` 의 URL 부터 보고, 없을 때만 `Artifact action:"list"` 로 찾는다.
+
 ### 3. 칸을 쓴다
 블록 구성과 쓰는 법은 `references/section-recipe.md`, 질문 작성법은
 `references/questions.md`, 실험 패턴은 `references/labs.md`.
-`assets/template.html` 을 복사해 채운다. **칸 HTML(내용)과 화면 껍데기(틀)는 따로다.**
+`assets/template.html` 을 `~/.claude/study-my-code/<프로젝트>/haeseolseo/haeseolseo.html` 로 복사해 채운다(아래 명령의 `해설서.html` 이 이 파일). **칸 HTML(내용)과 화면 껍데기(틀)는 따로다.**
 - 내용: `section.lv` 칸들, 목차 `nav.rail`(`.rail-h` 묶음 이름이 지도 화면의 묶음이 된다), 머리글 `.masthead`, 용어 `dl.gloss`.
 - 껍데기: `assets/shell.css` + `assets/shell.js`. 화면 다섯 개를 만든다 — **지도**(준비도 원, 칸 카드, 답하는 법 카드),
   **칸 읽기**(한 칸씩, 오른쪽에 단계 목록 · 질문 사다리 · 확인 진행, 처음 보는 칸은 한 줄 요약을 가림, 질문마다 「다시 / 애매 / 자신 있음」),
@@ -104,24 +122,24 @@ node ${CLAUDE_SKILL_DIR}/scripts/shot.js 해설서.html home ""                 
 node ${CLAUDE_SKILL_DIR}/scripts/shot.js 해설서.html lv02 'HS.openSec("lv02")' # 칸 읽기 화면
 node ${CLAUDE_SKILL_DIR}/scripts/shot.js 해설서.html prac 'HS.show("practice")'
 ```
-`check.js` 가 「문제 없음」이어야 하고, 사진의 오류 칸이 `none` 이어야 한다(사진은 `shots/` 에 생긴다. 확인하면 지운다).
+`check.js` 가 「문제 없음」이어야 하고, 사진의 오류 칸이 `none` 이어야 한다(사진은 파일 옆 `shots/` 에 생긴다. 확인하면 지운다).
 headless Chrome 은 스크롤한 화면을 못 찍으니 아래쪽을 보려면 위 블록을 `display:none` 으로 가리는 JS 를 넘긴다.
 그 다음 「우리 코드」 블록 3개 이상을 골라 실제 파일과 한 줄씩 대조한다.
 
 ### 5. 발행
 `artifact-design` 스킬을 먼저 불러 디자인을 점검한 뒤 `Artifact` 로 발행한다.
-제목은 `<프로젝트명> 해설서`, 파비콘은 프로젝트를 상징하는 이모지 하나.
+제목은 `<프로젝트명> 해설서`, 파비콘은 프로젝트를 상징하는 이모지 하나. 받은 URL 은 `links.json` 의 `haeseolseo` 칸에 적는다.
 사용자에게는 링크와 함께 **조사에서 새로 드러난 것**(README · 포트폴리오 · 이력서가 저장소와 어긋난 곳,
 작성자 귀속이 README 와 다른 곳, 면접에서 가장 위험한 질문, 가장 강한 카드)을 먼저 알린다.
 
 ## 기존 해설서 갱신
-같은 프로젝트 해설서가 이미 있으면(`Artifact action:"list"`) 새로 만들지 않고 읽어서
+같은 프로젝트 해설서가 이미 있으면(`links.json` → 없으면 `Artifact action:"list"`) 새로 만들지 않고 읽어서
 그 위에 고친다. 사용자의 체크·읽음·질문 평가는 브라우저 localStorage 에 있으니
 **같은 URL 로 발행하고**, 저장 키와 칸 id 를 바꾸지 않는다(URL 이 바뀌면 진행 기록이 끊긴다).
 
 **화면만 최신으로 바꿀 때** (내용은 그대로):
 1. `Artifact action:"read"` 로 받은 HTML 파일을 끝까지 읽는다.
-2. `node ${CLAUDE_SKILL_DIR}/scripts/upgrade.js <받은 파일> <작업 파일>` — 발행 때 씌워진 문서 뼈대를 벗기고 껍데기를 넣는다.
+2. `node ${CLAUDE_SKILL_DIR}/scripts/upgrade.js <받은 파일> <프로젝트 폴더>/haeseolseo/haeseolseo.html` — 발행 때 씌워진 문서 뼈대를 벗기고 껍데기를 넣는다.
    예전 해설서의 공용 스크립트(`STORE_KEY`)는 껍데기로 바꾸고 키를 이어 받는다. 스크립트 하나에 다 들어 있는 아주 옛 해설서는
    그 스크립트를 그대로 두고 껍데기만 앞에 넣는다(카드 id 는 순번 방식으로 맞춘다).
 3. `check.js` · `shot.js` 로 확인하고, 칸 `section.lv` 와 프로젝트 전용 스크립트가 원본과 같은지 대조한 뒤 같은 URL 로 발행한다.
