@@ -58,10 +58,23 @@ node engine/smoke.js example/workspace
 
 ## project-haeseolseo
 
-프로젝트의 핵심 결정 · 코드 경로 · 트러블슈팅 커밋마다 **칸**을 하나씩 만들어요. 칸마다 한 줄 요약, 바닥 원리와 비유, 눌러 보는 재현 실험, 실제 코드, 정직 표시, "다시 한다면" 비교표, 예상 질문(기본 · 꼬리 · 압박)과 1인칭 답, 면접 전 확인 체크리스트가 들어가요. 맨 끝에는 용어 사전과 무작위 모의 면접 카드가 있어요.
+프로젝트의 핵심 결정 · 코드 경로 · 트러블슈팅 커밋마다 **칸**을 하나씩 만들어요. 칸마다 한 줄 요약, 바닥 원리와 비유, 눌러 보는 재현 실험, 실제 코드, 정직 표시, "다시 한다면" 비교표, 예상 질문(기본 · 꼬리 · 압박)과 1인칭 답, 면접 전 확인 체크리스트가 들어가요.
+
+![지도 — 면접 준비도와 칸 카드](docs/screenshots/haeseolseo-home.png)
+
+- **지도**: 면접 준비도(칸 읽음 · 질문 자신감 · 확인 항목), 답하는 법 카드, 칸마다 질문 점(모양은 기본 · 꼬리 · 압박, 색은 자신감)
+- **칸 읽기**: 한 칸씩. 처음 보는 칸은 한 줄 요약을 가려 두고 먼저 말해 보게 해요. 오른쪽에 이 칸의 단계 목록과 질문 사다리
+- **말하기 연습**: 카드 섞기 · 꼬리 물기(한 칸을 기본 → 꼬리 → 압박으로) · 압박 면접(시간 제한). 답을 연 뒤 "못함 / 애매 / 됨"으로 스스로 평가하고, 약한 질문이 먼저 나와요
+- **용어** · **면접 전 확인**: 검색 · 뜻 가리기, 모든 칸의 확인 항목을 한곳에
+
+| 칸 읽기 | 말하기 연습 |
+|---|---|
+| ![칸 읽기](docs/screenshots/haeseolseo-read.png) | ![말하기 연습](docs/screenshots/haeseolseo-practice.png) |
 
 - 기준은 **GitHub 저장소**예요. 포트폴리오 사이트 · 이력서의 주장은 저장소와 대조만 해요.
 - 팀 프로젝트면 `git blame` · 커밋으로 **내 몫과 팀 몫**을 갈라 "그건 누가 했나요?"에 대비해요.
+- 내용(칸 HTML)과 화면 껍데기가 나뉘어 있어서, 예전에 만든 해설서도 `node scripts/upgrade.js 해설서.html` 로 새 화면을 입힐 수 있어요. 체크 · 평가 기록은 그대로 이어져요.
+- 예시는 [`plugins/project-haeseolseo/skills/project-haeseolseo/example/todo-haeseolseo.html`](plugins/project-haeseolseo/skills/project-haeseolseo/example/todo-haeseolseo.html) — code-reader 예시와 같은 가짜 할 일 앱의 해설서예요. 브라우저로 바로 열 수 있어요.
 
 ## codebase-anatomy
 
@@ -74,8 +87,9 @@ node engine/smoke.js example/workspace
 plugins/<이름>/.claude-plugin/plugin.json
 plugins/<이름>/skills/<이름>/SKILL.md   Claude 가 읽는 작업 순서와 규칙
                              references/   자세한 규칙 · 예시
-                             assets/ · engine/   페이지 틀 · 스크립트
-docs/screenshots/                   README 사진 (code-reader 예시로 찍음)
+                             assets/ · engine/ · scripts/   페이지 틀 · 스크립트
+                             example/      개인 정보 없는 예시
+docs/screenshots/                   README 사진 (예시 프로젝트로 찍음)
 ```
 
 ## 라이선스

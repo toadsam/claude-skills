@@ -377,144 +377,19 @@ figcaption{font-size:13px;color:var(--muted);margin-top:6px}
   </dl>
 </section>
 
-<!-- ── 모의 면접 카드 (문서의 모든 details.qa 를 자동으로 카드로 만든다) ── -->
+<!-- ── 모의 면접 카드: 화면은 껍데기의 「말하기 연습」이 만든다. 이 칸은 목차 자리만 맡는다 ── -->
 <section class="lv" id="drill">
-  <div class="lv-head"><span class="n">—</span><h2>모의 면접 카드</h2><span class="tag">무작위 · 답 가리고 소리 내서</span></div>
-  <div class="body">
-    <p>위의 예상 질문이 전부 카드로 들어 있습니다. 질문을 보고 <strong>소리 내서 답한 뒤</strong> 답을 펼쳐 비교하세요. 「자신 있음」으로 표시한 카드는 다음부터 덜 나오고, 진행은 이 브라우저에만 저장됩니다.</p>
-  </div>
-  <div class="drill">
-    <div class="meta">
-      <label>범위 <select id="d-filter"><option value="all">전체</option><option value="t1">기본만</option><option value="t2">꼬리만</option><option value="t3">압박만</option></select></label>
-      <span id="d-count">—</span>
-      <button class="btn ghost" id="d-reset" style="margin-left:auto;font-size:12.5px;padding:4px 10px">진행 초기화</button>
-    </div>
-    <div class="bar"><i id="d-bar"></i></div>
-    <div class="card">
-      <div class="lvl" id="d-lvl"></div>
-      <div class="q" id="d-q">카드를 뽑는 중…</div>
-      <div class="ans" id="d-a" hidden></div>
-    </div>
-    <div class="acts">
-      <button class="btn" id="d-show">답 보기</button>
-      <button class="btn ghost" id="d-ok">자신 있음 ✓</button>
-      <button class="btn ghost" id="d-again">다시 볼 것</button>
-      <button class="btn ghost" id="d-next">다음 카드 →</button>
-    </div>
-  </div>
+  <div class="lv-head"><span class="n">—</span><h2>모의 면접 카드</h2><span class="tag">말하기 연습 화면으로 이동</span></div>
+  <div class="drill"></div>
 </section>
 
 </main>
 </div>
 </div>
 
-<!-- ════ 공용 스크립트: 수정하지 않는다. STORE_KEY 만 프로젝트마다 바꾼다 ════ -->
-<script>
-(function(){
-  var STORE_KEY = "{{project-slug}}-guide";
-  var $=function(s,r){return (r||document).querySelector(s)};
-  var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
-  var reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  function log(el,html){el.innerHTML=html}
-  function add(el,html){el.innerHTML+=html}
-  function wait(ms){ return new Promise(function(r){setTimeout(r,reduced?0:ms)}) }
-  function load(k){ try{ return JSON.parse(localStorage.getItem(STORE_KEY+"-"+k)||"{}")||{} }catch(e){ return {} } }
-  function save(k,v){ try{ localStorage.setItem(STORE_KEY+"-"+k,JSON.stringify(v)) }catch(e){} }
-  window.G={$:$,$$:$$,log:log,add:add,wait:wait,reduced:reduced};
-
-  /* 목차 하이라이트 */
-  var links=$$(".rail a"), secs=$$(".lv");
-  if("IntersectionObserver" in window){
-    var io=new IntersectionObserver(function(es){
-      es.forEach(function(e){ if(e.isIntersecting){ links.forEach(function(a){a.classList.toggle("on",a.getAttribute("href")==="#"+e.target.id)}) } });
-    },{rootMargin:"-20% 0px -70% 0px"});
-    secs.forEach(function(s){io.observe(s)});
-  }
-
-  /* 범용 단계 실험 [data-stepper] */
-  $$("[data-stepper]").forEach(function(root){
-    var steps=$$(".step",root), L=$(".log",root), next=$(".js-next",root), reset=$(".js-reset",root), i=-1;
-    var label=next?next.textContent:"다음 단계 ▶";
-    function render(){
-      steps.forEach(function(s,k){s.classList.toggle("on",k<=i)});
-      if(next){ next.disabled=i>=steps.length-1; next.textContent=i>=steps.length-1?"끝":label; }
-      L.innerHTML = i<0 ? '<span class="k">'+(L.dataset.empty||"//")+'</span>' : (steps[i].dataset.msg||"");
-    }
-    if(next) next.addEventListener("click",function(){ if(i<steps.length-1){i++;render()} });
-    if(reset) reset.addEventListener("click",function(){i=-1;render()});
-    render();
-  });
-
-  /* 범용 선택 실험 .stack[data-picker] : button[data-msg] 를 누르면 같은 lab-b 안 .log 에 찍힘 */
-  $$(".stack[data-picker]").forEach(function(root){
-    var L=root.parentNode.querySelector(".log");
-    $$("button",root).forEach(function(b){b.addEventListener("click",function(){
-      $$("button",root).forEach(function(x){x.classList.toggle("on",x===b)});
-      L.innerHTML=b.dataset.msg||"";
-    })});
-  });
-
-  /* 범용 스위치: .switch[data-on][data-off] — 누르면 aria-pressed·라벨이 바뀌고 "flip" 이벤트(detail=true/false)를 낸다 */
-  $$(".switch[data-on]").forEach(function(b){b.addEventListener("click",function(){
-    var v=b.getAttribute("aria-pressed")!=="true"; b.setAttribute("aria-pressed",String(v));
-    b.lastChild.textContent=v?b.dataset.on:b.dataset.off;
-    b.dispatchEvent(new CustomEvent("flip",{detail:v}));
-  })});
-
-  /* 면접 전 확인: 체크 상태 저장 + 진행도 + 목차에 완료 표시 */
-  var checks=load("checks");
-  $$(".check").forEach(function(box){
-    var sec=box.closest(".lv"), id=sec?sec.id:"x", inputs=$$("input[type=checkbox]",box);
-    var prog=document.createElement("span"); prog.className="prog"; box.querySelector(".h").appendChild(prog);
-    function upd(){
-      var n=inputs.filter(function(x){return x.checked}).length; prog.textContent=n+" / "+inputs.length;
-      var a=$('.rail a[href="#'+id+'"]'); if(a){ var m=$("i",a)||a.appendChild(document.createElement("i")); m.textContent=n===inputs.length?"✓":""; }
-    }
-    inputs.forEach(function(x,k){ var key=id+":"+k; x.checked=!!checks[key];
-      x.addEventListener("change",function(){ checks[key]=x.checked; save("checks",checks); upd(); }); });
-    upd();
-  });
-
-  /* 모의 면접 카드: 문서의 모든 details.qa 에서 자동 생성 */
-  var cards=[];
-  $$("details.qa").forEach(function(d,i){
-    var sec=d.closest(".lv"), lvl=sec?sec.querySelector(".lv-head h2").textContent:"";
-    var t=d.querySelector(".t"), tier=t?t.className.replace("t ",""):"t1";
-    var q=d.querySelector("summary").textContent.replace(/^(기본|꼬리|압박)/,"").trim();
-    var a=d.querySelector(".ans")?d.querySelector(".ans").innerHTML:"";
-    cards.push({id:(sec?sec.id:"x")+":"+i,lvl:lvl,tier:tier,q:q,a:a});
-  });
-  var state=load("drill"), cur=null;
-  function pool(){ var f=$("#d-filter").value; return cards.filter(function(c){return f==="all"||c.tier===f}) }
-  function pick(){
-    var p=pool(); if(!p.length){ cur=null; return; }
-    var hard=p.filter(function(c){return state[c.id]!=="ok"});
-    var from = hard.length && Math.random()<0.85 ? hard : p;
-    var next; do{ next=from[Math.floor(Math.random()*from.length)] }while(from.length>1 && cur && next.id===cur.id);
-    cur=next;
-  }
-  function render(){
-    var p=pool(), done=p.filter(function(c){return state[c.id]==="ok"}).length;
-    $("#d-count").textContent = done+" / "+p.length+" 자신 있음";
-    $("#d-bar").style.width = p.length? (done/p.length*100)+"%":"0%";
-    if(!cur){ $("#d-q").textContent="이 범위에는 카드가 없습니다."; $("#d-lvl").textContent=""; $("#d-a").hidden=true; return; }
-    var tn={t1:"기본",t2:"꼬리",t3:"압박"}[cur.tier];
-    $("#d-lvl").textContent = cur.lvl+" · "+tn+(state[cur.id]==="ok"?" · 자신 있음 ✓":state[cur.id]==="again"?" · 다시 볼 것":"");
-    $("#d-q").textContent = cur.q;
-    $("#d-a").innerHTML = cur.a; $("#d-a").hidden=true;
-    $("#d-show").disabled=false;
-  }
-  if($("#drill")){
-    $("#d-show").addEventListener("click",function(){ $("#d-a").hidden=false; this.disabled=true });
-    $("#d-ok").addEventListener("click",function(){ if(cur){ state[cur.id]="ok"; save("drill",state); pick(); render(); } });
-    $("#d-again").addEventListener("click",function(){ if(cur){ state[cur.id]="again"; save("drill",state); pick(); render(); } });
-    $("#d-next").addEventListener("click",function(){ pick(); render(); });
-    $("#d-filter").addEventListener("change",function(){ pick(); render(); });
-    $("#d-reset").addEventListener("click",function(){ state={}; save("drill",state); pick(); render(); });
-    pick(); render();
-  }
-})();
-</script>
+<!-- ════ 화면 껍데기(지도 · 칸 읽기 · 말하기 연습 · 용어 · 확인)와 공용 스크립트(window.G, 체크 저장, 범용 실험).
+     비워 둔 채로 두고, 다 쓴 뒤 `node scripts/upgrade.js 해설서.html` 이 채운다. data-key 만 프로젝트 slug 로 바꾼다 ════ -->
+<script id="hs-runtime" data-key="{{project-slug}}-guide"></script>
 
 <!-- ════ 프로젝트 전용 실험 스크립트: 칸마다 /* lvNN 제목 */ 주석으로 구분. window.G 의 헬퍼를 쓴다 ════ -->
 <script>

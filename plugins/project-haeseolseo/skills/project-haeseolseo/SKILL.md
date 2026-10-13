@@ -74,29 +74,39 @@ description: Build a Korean interview-prep "해설서" for one of the user's own
 ### 3. 칸을 쓴다
 블록 구성과 쓰는 법은 `references/section-recipe.md`, 질문 작성법은
 `references/questions.md`, 실험 패턴은 `references/labs.md`.
-`assets/template.html` 을 복사해 채운다. 디자인 시스템 · 목차 · 체크 저장 · 모의 면접 카드
-스크립트가 이미 들어 있으니 CSS와 공용 스크립트는 고치지 않는다. 바꾸는 것은:
-- `--accent` 계열 팔레트(라이트 · 다크 두 벌)와 `--on-sem`(배지 글자색)을 프로젝트에 맞게. 프로젝트 자체에 색 토큰(CSS 변수)이 있으면 그걸 가져온다.
-- `STORE_KEY` 를 프로젝트 slug 로.
-- 실험 로그 · 기술 지도 설명 문자열 안에도 근거 없는 「왜」를 지어내지 않는다. 이유가 기록에 없으면 「기록에 없음 → 확인」이라고 쓴다.
-- 칸별 실험은 맨 아래 「프로젝트 전용 실험 스크립트」에만 쓴다.
+`assets/template.html` 을 복사해 채운다. **칸 HTML(내용)과 화면 껍데기(틀)는 따로다.**
+- 내용: `section.lv` 칸들, 목차 `nav.rail`(`.rail-h` 묶음 이름이 지도 화면의 묶음이 된다), 머리글 `.masthead`, 용어 `dl.gloss`.
+- 껍데기: `assets/shell.css` + `assets/shell.js`. 화면 다섯 개를 만든다 — **지도**(준비도 원, 칸 카드, 답하는 법 카드),
+  **칸 읽기**(한 칸씩, 오른쪽에 단계 목록 · 질문 사다리 · 확인 진행, 처음 보는 칸은 한 줄 요약을 가림, 질문마다 「다시 / 애매 / 자신 있음」),
+  **말하기 연습**(카드 섞기 · 꼬리 물기 · 압박 면접 + 시간 제한, 질문 지도 히트맵), **용어**(검색 · 뜻 가리기 · 나온 칸), **면접 전 확인**(전 칸 모아 보기).
+  껍데기는 직접 쓰거나 고치지 않는다. 다 쓴 뒤 `node ${CLAUDE_SKILL_DIR}/scripts/upgrade.js 해설서.html` 이 넣는다.
 
-분량 기준: 칸 12개 안팎, 칸마다 질문 3~6개(기본 · 꼬리 · 압박 섞어서),
+껍데기가 내용에서 읽는 것 (그래서 빠뜨리면 화면이 비는 것):
+- 칸마다 `.lv-head` 의 `.n` 번호 · `h2` 제목 · `.by` 배지 · `.tag`(「가장 중요한 칸」이 들어가면 지도에 ★), 그리고 `.oneline`(지도 카드 설명 · 가리기).
+- 답하는 법 칸의 `.strategy .box`(`b.h` 제목) → 지도 화면 「답하는 법」 카드.
+- `details.qa` + `.t.t1/t2/t3` + `.ans` + `.tip` → 질문 사다리 · 말하기 연습 카드.
+- `.check input[type=checkbox]` → 확인 화면 · 준비도.
+
+바꾸는 것은:
+- `--accent` 계열 팔레트(라이트·다크 두 벌)와 `--on-sem`(배지 글자색)을 프로젝트에 맞게. 껍데기도 이 색을 그대로 쓴다. 프로젝트 자체에 색 토큰(CSS 변수)이 있으면 그걸 가져온다.
+- `<script id="hs-runtime" data-key="…">` 의 `data-key` 를 `<프로젝트-slug>-guide` 로. 체크 · 읽음 · 질문 평가가 이 키로 저장된다.
+- 실험 로그·기술 지도 설명 문자열 안에도 근거 없는 「왜」를 지어내지 않는다. 이유가 기록에 없으면 「기록에 없음 → 확인」이라고 쓴다.
+- 칸별 실험은 맨 아래 「프로젝트 전용 실험 스크립트」에만 쓴다. `window.G` 헬퍼는 껍데기가 만든다.
+
+분량 기준: 칸 12개 안팎, 칸마다 질문 3~6개(기본·꼬리·압박 섞어서),
 확인 항목 2~5개, 실험은 핵심 칸에 1~2개, 전체 질문 45개 안팎, 용어 30개 안팎.
 
-### 4. 검증 (발행 전 필수)
+### 4. 껍데기를 넣고 검증한다 (발행 전 필수)
 ```bash
-node -e '
-const fs=require("fs");const h=fs.readFileSync(process.argv[1],"utf8");
-const s=[...h.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m=>m[1]);
-s.forEach((b,i)=>{try{new Function(b)}catch(e){console.log("script",i,e.message)}});
-const ids=new Set([...h.matchAll(/id="([^"]+)"/g)].map(m=>m[1]));
-[...h.matchAll(/\$\("#([\w-]+)"\)/g)].forEach(m=>{if(!ids.has(m[1]))console.log("missing #"+m[1])});
-[...h.matchAll(/href="#([\w-]+)"/g)].forEach(m=>{if(!ids.has(m[1]))console.log("broken link #"+m[1])});
-console.log("{{ left:",(h.match(/\{\{/g)||[]).length,"| qa:",(h.match(/class="qa"/g)||[]).length,"| checks:",(h.match(/type="checkbox"/g)||[]).length);
-' 해설서.html
+node ${CLAUDE_SKILL_DIR}/scripts/upgrade.js 해설서.html     # 껍데기를 넣는다 (다시 돌려도 최신으로 바꿔 끼울 뿐)
+node ${CLAUDE_SKILL_DIR}/scripts/check.js 해설서.html       # 문법 · 없는 id · 깨진 링크 · 남은 {{ }} · 껍데기 · 저장 키
+node ${CLAUDE_SKILL_DIR}/scripts/shot.js 해설서.html home ""                 # 지도 화면 사진 (Chrome/Edge 필요)
+node ${CLAUDE_SKILL_DIR}/scripts/shot.js 해설서.html lv02 'HS.openSec("lv02")' # 칸 읽기 화면
+node ${CLAUDE_SKILL_DIR}/scripts/shot.js 해설서.html prac 'HS.show("practice")'
 ```
-`{{` 가 0 이어야 한다(코드 조각 속 `${{ vars.X }}` 같은 원문은 예외). 그 다음 「우리 코드」 블록 3개 이상을 골라 실제 파일과 한 줄씩 대조한다.
+`check.js` 가 「문제 없음」이어야 하고, 사진의 오류 칸이 `none` 이어야 한다(사진은 `shots/` 에 생긴다. 확인하면 지운다).
+headless Chrome 은 스크롤한 화면을 못 찍으니 아래쪽을 보려면 위 블록을 `display:none` 으로 가리는 JS 를 넘긴다.
+그 다음 「우리 코드」 블록 3개 이상을 골라 실제 파일과 한 줄씩 대조한다.
 
 ### 5. 발행
 `artifact-design` 스킬을 먼저 불러 디자인을 점검한 뒤 `Artifact` 로 발행한다.
@@ -106,5 +116,12 @@ console.log("{{ left:",(h.match(/\{\{/g)||[]).length,"| qa:",(h.match(/class="qa
 
 ## 기존 해설서 갱신
 같은 프로젝트 해설서가 이미 있으면(`Artifact action:"list"`) 새로 만들지 않고 읽어서
-그 위에 고친다. 사용자의 체크 · 카드 진행은 브라우저 localStorage 에 있으니
-`STORE_KEY` 와 칸 id 를 바꾸지 않는다.
+그 위에 고친다. 사용자의 체크·읽음·질문 평가는 브라우저 localStorage 에 있으니
+**같은 URL 로 발행하고**, 저장 키와 칸 id 를 바꾸지 않는다(URL 이 바뀌면 진행 기록이 끊긴다).
+
+**화면만 최신으로 바꿀 때** (내용은 그대로):
+1. `Artifact action:"read"` 로 받은 HTML 파일을 끝까지 읽는다.
+2. `node ${CLAUDE_SKILL_DIR}/scripts/upgrade.js <받은 파일> <작업 파일>` — 발행 때 씌워진 문서 뼈대를 벗기고 껍데기를 넣는다.
+   예전 해설서의 공용 스크립트(`STORE_KEY`)는 껍데기로 바꾸고 키를 이어 받는다. 스크립트 하나에 다 들어 있는 아주 옛 해설서는
+   그 스크립트를 그대로 두고 껍데기만 앞에 넣는다(카드 id 는 순번 방식으로 맞춘다).
+3. `check.js` · `shot.js` 로 확인하고, 칸 `section.lv` 와 프로젝트 전용 스크립트가 원본과 같은지 대조한 뒤 같은 URL 로 발행한다.
