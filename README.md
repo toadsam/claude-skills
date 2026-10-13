@@ -80,6 +80,20 @@ node engine/smoke.js example/workspace
 
 실제 소스에서 **명령으로 뽑은** 숫자와 그래프로 해부도를 만들어요: 몇 개의 프로그램이 도는지, 계층 구조, 요청 추적기(여러 시나리오를 한 걸음씩), 처음부터 쌓는 보안 기초, 데이터 모델, git 으로 본 프로젝트 역사, 근거가 붙은 결함 목록과 잘된 점, 손으로 해 보는 실습과 퀴즈.
 
+![지도 — 이해도와 결함 현황, 장 카드](docs/screenshots/anatomy-home.png)
+
+- **지도**: 내 코드 이해도(장 읽음 · 퀴즈 · 결함 확인), 심각도별 결함 수와 가장 급한 결함, 월별 커밋, 장 카드
+- **장 읽기**: 한 장씩. 요청 추적기는 프로그램(브라우저 · 서버 · DB …)을 줄로 그린 그림 위에서 요청이 한 칸씩 움직이고, 점을 누르면 그 단계로 가요
+- **결함 보드**: 심각도별 칸, 결함마다 근거 코드 · 무엇이 문제 · 왜 중요 · 고치는 법, "이해함 / 고침" 표시, 잘된 점 탭
+- **퀴즈** · **용어**: 한 문제씩(답 기억), 검색 · 뜻 가리기
+
+| 장 읽기 · 요청 추적기 | 결함 보드 |
+|---|---|
+| ![요청 추적기](docs/screenshots/anatomy-trace.png) | ![결함 보드](docs/screenshots/anatomy-fx.png) |
+
+- 해설서처럼 내용(장 · 데이터)과 화면 껍데기가 나뉘어 있어서, 예전 해부도도 `node scripts/upgrade.js 해부도.html` 로 새 화면을 입힐 수 있어요.
+- 예시는 [`plugins/codebase-anatomy/skills/codebase-anatomy/example/todo-anatomy.html`](plugins/codebase-anatomy/skills/codebase-anatomy/example/todo-anatomy.html) — 가짜 할 일 앱(TodoBox)의 해부도예요. 경로 · 숫자는 전부 예시예요.
+
 ## 저장소 구조
 
 ```

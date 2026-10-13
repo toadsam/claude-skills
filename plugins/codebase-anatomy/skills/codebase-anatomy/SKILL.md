@@ -103,13 +103,36 @@ Copy `assets/kit.html` and fill its data arrays — it carries the design system
 tested components. How to use it: `references/kit-usage.md`. Do not rewrite the CSS/JS;
 it is already verified for light/dark/system themes, mobile, and partial-failure safety.
 
+**Content and screen are separate.** The kit holds the content (chapters + data arrays).
+The screen shell (`assets/shell.css` + `assets/shell.js`, "as-shell") turns it into an app
+with five views — **map** (understanding ring, severity counts with the top findings, a
+commit sparkline from `TIMELINE`, chapter cards), **chapter reader** (one chapter at a time,
+a side list of the chapter's parts and the findings it cites, prev/next, read marks; the
+request tracer gains a clickable lane diagram with a moving packet), **defect board**
+(columns by severity, mark each finding 이해함 / 고침, a tab for what is done well),
+**quiz** (one question at a time, answers remembered), **glossary** (search, hide definitions). Never write or edit the shell
+by hand; inject it after the content is done:
+
+```bash
+node ${CLAUDE_SKILL_DIR}/scripts/upgrade.js anatomy.html --key <project-slug>-anatomy
+```
+
+The shell only *reads* the content: `section[data-nav]` inside `main.main`, `.eyebrow`,
+`h2`, and the kit's arrays (`FINDINGS`, `QUIZ`, `TRACES`, `GLOSSARY`, `STATS`). Lane names in
+the tracer come from each step's `wl` prefix (text before ` · `), so keep `wl` short and
+consistent per lane.
+
 ### Phase 6 — Verify (mandatory before publishing)
 
+```bash
+node ${CLAUDE_SKILL_DIR}/scripts/check.js anatomy.html   # syntax · {{xref}} · array shapes · data-t · shell present
+node ${CLAUDE_SKILL_DIR}/scripts/shot.js anatomy.html home ""                  # map view (needs Chrome/Edge)
+node ${CLAUDE_SKILL_DIR}/scripts/shot.js anatomy.html trace 'AS.openSec("sTRACE")'
+node ${CLAUDE_SKILL_DIR}/scripts/shot.js anatomy.html fx 'AS.show("fx")'
 ```
-node -e "…"   # extract <script> blocks, new Function(b) each → syntax check
-              # every getElementById target exists in markup
-              # section count == eyebrow count; {{xref}} tokens all resolve
-```
+`check.js` must print 「문제 없음」 and each screenshot's error field must be `none`
+(shots land in `shots/` next to the file; delete them after looking). Headless Chrome cannot
+capture a scrolled view, so to see something lower down, pass JS that hides the blocks above it.
 Then re-check a sample of `file:line` claims against the real files. A wrong line number
 destroys the document's only real asset — its trustworthiness.
 
@@ -118,6 +141,20 @@ destroys the document's only real asset — its trustworthiness.
 Load `artifact-design` per its own trigger rules, then publish with the `Artifact` tool.
 Hand the user the URL and a summary of what the investigation actually found —
 lead with the discoveries, not the feature list.
+
+## Updating an existing anatomy
+
+If one already exists for the project (`Artifact action:"list"`), read it and build on it —
+same URL, same `--key`, same section ids. Read marks, fix marks and quiz answers live in the
+reader's localStorage under that key; a new URL or key silently drops them.
+
+**Screen-only refresh** (content unchanged):
+1. `Artifact action:"read"`, then read the saved file to the last line.
+2. `node ${CLAUDE_SKILL_DIR}/scripts/upgrade.js <saved file> <work file>` — strips the publish
+   wrapper and injects (or swaps in the latest) shell. Running it again is safe.
+3. `check.js` + `shot.js`, confirm the chapters and data block are unchanged from the original,
+   then publish to the same URL. A share link pinned to an older version keeps showing that
+   version until the owner moves the pin — say so.
 
 ## Scaling
 

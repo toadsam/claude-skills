@@ -73,24 +73,47 @@ pure arithmetic you can port exactly. Add `#calcIn` / `#calcOut` hosts, write in
 faithfully, ship the table instead; an approximation that disagrees with the server teaches
 a false model.
 
+## The screen shell
+
+Do not paste `shell.css` / `shell.js` into the kit. When the content is done:
+
+```bash
+node ${CLAUDE_SKILL_DIR}/scripts/upgrade.js docs/<project>-anatomy.html --key <project>-anatomy
+```
+
+It inserts `<style id="as-shell">` after the kit's own `<style>` and
+`<script id="as-runtime" data-key="…">` at the very end, so it runs after the kit has
+rendered everything. It is idempotent: run it again after a shell update and it swaps in the
+new version, keeping the key. Things the shell depends on:
+
+- Sections stay `section[data-nav]` inside `main.main` in `.shell`.
+- Map cards follow section order and take their category label from `.eyebrow`. The first
+  section (hero) becomes the map header: its `h1`, `.hero-sub`, `.lead` and `.stat` strip are
+  reused, so keep them filled.
+- Tracer lanes: steps sharing a `w` value form a lane; its label is the most common `wl`
+  prefix before ` · ` (≤ 8 chars), else a default per `w`. Write `wl:"백엔드 · service"`,
+  not a long sentence.
+- Finding `what` / `why` / `fix` and glossary values may contain HTML; the shell renders it.
+- Hash links use `#/sectionId`. Plain `#sectionId` still works.
+- `window.AS.show("home"|"read"|"fx"|"quiz"|"gloss")` and `AS.openSec(id)` switch views —
+  handy for screenshots.
+
 ## Verify before publishing
 
 ```bash
-node -e "
-const fs=require('fs'),src=fs.readFileSync('FILE','utf8');
-[...src.matchAll(/<script>([\s\S]*?)<\/script>/g)].forEach((m,i)=>{
-  try{ new Function(m[1]); console.log('script '+(i+1)+' OK'); }
-  catch(e){ console.log('script '+(i+1)+' ERROR '+e.message); }});
-const need=[...new Set([...src.matchAll(/getElementById\(\"([^\"]+)\"\)/g)].map(m=>m[1]))];
-const have=new Set([...src.matchAll(/ id=\"([^\"]+)\"/g)].map(m=>m[1]));
-console.log('missing hosts:', need.filter(n=>!have.has(n)).join(', ')||'none');
-console.log('sections:', (src.match(/<section /g)||[]).length);
-"
+node ${CLAUDE_SKILL_DIR}/scripts/check.js FILE
 ```
 
-For a full runtime check, render with jsdom and assert component counts plus zero errors.
-That is how the kit itself is tested, and it catches failures a syntax check cannot —
-one component throwing used to kill every component after it.
+It checks: every `<script>` parses, `{{xref}}` tokens point at real sections, the DATA block
+runs and its arrays have the right shapes (`sev`, quiz answer index, trace `w`), every `data-t`
+is in `GLOSSARY`, and the shell is present. Then look at it:
+
+```bash
+node ${CLAUDE_SKILL_DIR}/scripts/shot.js FILE home ""
+node ${CLAUDE_SKILL_DIR}/scripts/shot.js FILE trace 'AS.openSec("sTRACE")'
+```
+
+The PNG and the page's runtime errors land in `shots/`. Error field must read `none`.
 
 Last: re-verify a sample of `file:line` claims against the real files. A wrong line number
 costs the document the only thing it really has.

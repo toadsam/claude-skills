@@ -243,8 +243,8 @@ body.hs{background:var(--paper);overflow-y:scroll}
 body.hs > .wrap{display:none}
 .hs-app{--r-ok:var(--ok);--r-meh:var(--warn);--r-again:var(--bad);--r-none:var(--line);--hs-on:var(--on-sem,#fff);
   --hs-shadow:0 1px 2px rgba(0,0,0,.04),0 10px 30px -16px rgba(0,0,0,.22);min-height:100vh;color:var(--ink);font-family:var(--sans)}
-.hs-app button{font:inherit;cursor:pointer}
-.hs-app button:not(.lv button){color:inherit}  /* 칸 안(실험 버튼)은 문서 스타일 그대로 */
+.hs-app button{cursor:pointer}
+.hs-app button:not(.lv button){font:inherit;color:inherit}  /* 칸 안(실험 버튼)은 문서 스타일 그대로 */
 .hs-app [hidden]{display:none!important}
 @keyframes hsIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @keyframes hsPop{0%{transform:scale(.6)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
