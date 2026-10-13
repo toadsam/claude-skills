@@ -44,6 +44,24 @@ description: Build a Korean interview-prep "해설서" for one of the user's own
    팀원 담당 칸도 뺄 수는 없다. 「구조는 설명할 수 있고 구현은 팀원」으로 답을 짠다.
 7. **사용자의 언어로.** 기본 한국어. 문서 안 데이터 문자열까지.
 
+## 결과물이 남는 곳
+
+결과물은 **Artifact**(claude.ai 의 비공개 페이지)다. 원본 파일과 링크는 프로젝트마다 폴더 하나에 모은다.
+code-reader · project-haeseolseo · codebase-anatomy 세 스킬이 같은 폴더를 함께 쓴다.
+
+```
+~/.claude/study-my-code/<프로젝트>/
+  links.json      세 결과물의 아티팩트 URL · 제목 · 원본 파일 — 갱신할 때 여기서 먼저 찾는다
+  code-reader/    코드 리더 작업 폴더
+  haeseolseo/     haeseolseo.html  해설서 원본
+  anatomy/        anatomy.html     해부도 원본
+```
+
+- `<프로젝트>` 는 저장소 폴더 이름을 소문자 · 하이픈으로 바꾼 것(예: `todo-app`). 폴더가 이미 있으면 그 이름을 그대로 쓴다.
+- 분석하는 저장소 안에는 아무것도 쓰지 않는다. 세션 임시 폴더(scratchpad)에도 원본을 두지 않는다 — 세션이 끝나면 사라진다.
+- 발행하면 `links.json` 의 자기 칸만 채운다: `"haeseolseo": { "url", "title", "file": "haeseolseo/haeseolseo.html" }`. 다른 칸은 건드리지 않는다.
+- 갱신할 때는 `links.json` 의 URL 부터 보고, 없을 때만 `Artifact action:"list"` 로 찾는다.
+
 ## 워크플로
 
 ### 1. 칸의 출처를 정한다 — GitHub 저장소에서
@@ -70,24 +88,6 @@ description: Build a Korean interview-prep "해설서" for one of the user's own
   확장한 사람**을 가른다. README · 포트폴리오의 역할 문장은 확인 대상이지 근거가 아니다.
 - 포트폴리오 · 이력서의 숫자와 코드 조각을 저장소와 대조해 어긋나는 곳을 목록으로 만든다. 사용자에게 보고하고,
   고치라고 하면 고친다(`references/sources.md` 「포트폴리오 고치기」).
-
-## 결과물이 남는 곳
-
-결과물은 **Artifact**(claude.ai 의 비공개 페이지)다. 원본 파일과 링크는 프로젝트마다 폴더 하나에 모은다.
-code-reader · project-haeseolseo · codebase-anatomy 세 스킬이 같은 폴더를 함께 쓴다.
-
-```
-~/.claude/study-my-code/<프로젝트>/
-  links.json      세 결과물의 아티팩트 URL · 제목 · 원본 파일 — 갱신할 때 여기서 먼저 찾는다
-  code-reader/    코드 리더 작업 폴더
-  haeseolseo/     haeseolseo.html  해설서 원본
-  anatomy/        anatomy.html     해부도 원본
-```
-
-- `<프로젝트>` 는 저장소 폴더 이름을 소문자 · 하이픈으로 바꾼 것(예: `todo-app`). 폴더가 이미 있으면 그 이름을 그대로 쓴다.
-- 분석하는 저장소 안에는 아무것도 쓰지 않는다. 세션 임시 폴더(scratchpad)에도 원본을 두지 않는다 — 세션이 끝나면 사라진다.
-- 발행하면 `links.json` 의 자기 칸만 채운다: `"haeseolseo": { "url", "title", "file": "haeseolseo/haeseolseo.html" }`. 다른 칸은 건드리지 않는다.
-- 갱신할 때는 `links.json` 의 URL 부터 보고, 없을 때만 `Artifact action:"list"` 로 찾는다.
 
 ### 3. 칸을 쓴다
 블록 구성과 쓰는 법은 `references/section-recipe.md`, 질문 작성법은

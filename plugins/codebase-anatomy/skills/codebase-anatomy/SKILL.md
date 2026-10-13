@@ -32,6 +32,24 @@ makes the output worse than nothing, because the reader will *trust* it.
 7. **Write in the user's language.** Match the language of the request, including all
    generated data strings inside the HTML.
 
+## Where the output lives
+
+The result is an **Artifact** (a private claude.ai page). The source file and the link are kept in one
+folder per project, shared by all three skills (code-reader · project-haeseolseo · codebase-anatomy):
+
+```
+~/.claude/study-my-code/<project>/
+  links.json      artifact URL · title · source file of each result — look here first when updating
+  code-reader/    code-reader workspace
+  haeseolseo/     haeseolseo.html  interview guide source
+  anatomy/        anatomy.html     this skill's source
+```
+
+- `<project>` is the repository folder name in lowercase-with-hyphens (e.g. `todo-app`). If the folder already exists, reuse its name.
+- Never write into the repository being analyzed. Don't keep the source only in the session scratchpad — it disappears with the session.
+- After publishing, fill only this skill's entry: `"anatomy": { "url", "title", "file": "anatomy/anatomy.html" }`. Leave the others alone.
+- When updating, check `links.json` for the URL first; fall back to `Artifact action:"list"` only if it is missing.
+
 ## Workflow
 
 Work through the phases in order. Do not start writing prose until Phase 3 is done —
@@ -94,24 +112,6 @@ or a second developer; **low** = confusing, cosmetic, or dead weight.
 Sort by severity. Also collect the "done well" list with the same evidence standard.
 Design tensions (a rule that contradicts the product's promise) belong here too — they are
 often the most valuable finding and never appear in linters.
-
-## Where the output lives
-
-The result is an **Artifact** (a private claude.ai page). The source file and the link are kept in one
-folder per project, shared by all three skills (code-reader · project-haeseolseo · codebase-anatomy):
-
-```
-~/.claude/study-my-code/<project>/
-  links.json      artifact URL · title · source file of each result — look here first when updating
-  code-reader/    code-reader workspace
-  haeseolseo/     haeseolseo.html  interview guide source
-  anatomy/        anatomy.html     this skill's source
-```
-
-- `<project>` is the repository folder name in lowercase-with-hyphens (e.g. `todo-app`). If the folder already exists, reuse its name.
-- Never write into the repository being analyzed. Don't keep the source only in the session scratchpad — it disappears with the session.
-- After publishing, fill only this skill's entry: `"anatomy": { "url", "title", "file": "anatomy/anatomy.html" }`. Leave the others alone.
-- When updating, check `links.json` for the URL first; fall back to `Artifact action:"list"` only if it is missing.
 
 ### Phase 5 — Write
 

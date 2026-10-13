@@ -55,6 +55,8 @@ AI 와 같이 만든 프로젝트는 돌아가긴 하는데, "이 줄이 왜 있
 
 ## 설치
 
+저장소 이름은 `claude-skills` 이고, 설치할 때 쓰는 마켓플레이스 이름은 `study-my-code` 예요(`.claude-plugin/marketplace.json` 의 `name`). 그래서 추가할 때는 저장소 이름을, 설치할 때는 `@study-my-code` 를 써요.
+
 Claude Code 에서:
 
 ```text

@@ -13,7 +13,7 @@ plugins/project-haeseolseo/skills/project-haeseolseo/example/*.before-shell.html
 plugins/codebase-anatomy/skills/codebase-anatomy/example/shots/
 plugins/codebase-anatomy/skills/codebase-anatomy/example/*.before-shell.html
 
-# 실제 프로젝트의 작업 폴더는 여기에 두지 않는다 (~/.claude/code-reader/<이름>/)
+# 실제 프로젝트의 작업 폴더는 여기에 두지 않는다 (~/.claude/study-my-code/<프로젝트>/)
 node_modules/
 .DS_Store
 Thumbs.db
