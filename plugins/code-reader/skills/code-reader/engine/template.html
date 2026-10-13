@@ -1052,6 +1052,27 @@ body.noterms .term { text-decoration: none; }
 .rd-chg-k { width: fit-content; font-size: .7rem; font-weight: 800; color: #fff; background: #22c55e; border-radius: 999px; padding: 1px 8px; }
 .rd-chg-k.k-new { background: var(--bx); }
 .rd-chg-files { margin-top: 8px; }
+
+/* 읽는 방식 · 집중 보기 · 스스로 확인 */
+.rm-seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.rm-seg button{border:0;background:transparent;color:var(--ink-2);padding:6px 11px;font:inherit;font-size:.82rem;cursor:pointer;white-space:nowrap}
+.rm-seg button+button{border-left:1px solid var(--line)}
+.rm-seg button[aria-pressed="true"]{background:var(--accent);color:#fff;font-weight:700}
+.rm-focus[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:700}
+body.rm-think #readView .row.cmt.hn:not(.open) .tx{filter:blur(5px);opacity:.5;user-select:none}
+body.rm-think #readView .row.cmt.hn:not(.open){cursor:pointer}
+body.focusblk #code.hassel .row:not(.inblock){opacity:.2}
+#code .row{transition:opacity .18s}
+.rm-cover{border:1px dashed var(--accent);border-radius:12px;padding:14px;margin:10px 0;background:var(--accent-soft)}
+.rm-cover p{margin:6px 0 10px;line-height:1.65}
+.rm-cover textarea{width:100%;min-height:74px;box-sizing:border-box;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;font-size:.9rem;padding:8px 10px;resize:vertical;margin-bottom:10px}
+.rm-chk{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0;padding:10px 12px;border-radius:10px;border:1px solid var(--line)}
+.rm-chk>span{font-size:.86rem;color:var(--ink-2);flex:1 1 100%}
+.rm-chk>button{flex:1 1 0}
+.rm-chk button{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:8px;padding:5px 11px;font:inherit;font-size:.84rem;cursor:pointer}
+.rm-chk button[data-sc="ok"][aria-pressed="true"]{background:var(--ok);border-color:var(--ok);color:#fff}
+.rm-chk button[data-sc="miss"][aria-pressed="true"]{background:#dc2626;border-color:#dc2626;color:#fff}
+.rm-mine{font-size:.86rem;color:var(--ink-2);border-left:3px solid var(--accent);padding:4px 10px;margin:6px 0 10px;white-space:pre-wrap}
 </style>
 
 <div class="app">
@@ -1263,6 +1284,15 @@ function segTerms(s, at, lead, lang) {
 
 /* ---------- 코드 그리기 (한국어 주석 끼우기) ---------- */
 let inlineNotes = store.get("inlineNotes", true);
+// 읽는 방식: notes(해설 보며) · think(먼저 생각하기 — 줄 해설과 덩어리 설명을 가려 둠) · code(코드만)
+let readMode = store.get("readMode", inlineNotes ? "notes" : "code");
+if (readMode === "code") inlineNotes = false; else inlineNotes = true;
+let focusBlk = store.get("focusBlk", false);
+let selfChk = store.get("selfchk", {});          // 덩어리 키 → "ok"(맞혔어요) | "miss"(몰랐어요)
+const revealed = new Set(), myGuess = {};        // 이번에 열어 본 덩어리 · 내가 쓴 짐작
+document.body.classList.toggle("rm-think", readMode === "think");
+document.body.classList.toggle("focusblk", focusBlk);
+const thinkHidden = (f, bi) => readMode === "think" && !revealed.has(rk(f, bi));
 function plainNote(v) {
   return esc(String(v).replace(/\[\[([a-z0-9-]+)\]\]/g, (m, id) => TERM_BY_ID[id] ? TERM_BY_ID[id].label : id).replace(/`/g, ""));
 }
@@ -1304,7 +1334,7 @@ function docMask(f) {
   });
   return (f._doc = out);
 }
-function codeRows(f, lineBlock) {
+function codeRows(f, lineBlock, think) {
   let html = "";
   const doc = docMask(f), cm = f.lang === "py" || f.lang === "conf" ? "# " : f.lang === "md" ? "› " : "// ";
   f.lines.forEach((ln, i) => {
@@ -1313,20 +1343,34 @@ function codeRows(f, lineBlock) {
     const no = i + 1 + f.offset;
     const band = bi % 2 ? "bb" : "ba";
     if (inlineNotes && b && b.start === no) {
-      html += '<div class="row cmt banner ' + band + '" data-l="' + no + '"><span class="band"></span><span class="no"></span><span class="tx">' + cm + '━━ ' + (bi + 1) + ". " + esc(b.title) + " ━━</span></div>";
+      const hideT = think && thinkHidden(f, bi);
+      html += '<div class="row cmt banner ' + band + '" data-l="' + no + '" data-title="' + esc(cm + "━━ " + (bi + 1) + ". " + b.title + " ━━") + '"><span class="band"></span><span class="no"></span><span class="tx">' + cm + '━━ ' + (bi + 1) + (hideT ? "번 덩어리 · 먼저 생각해 보세요" : ". " + esc(b.title)) + " ━━</span></div>";
     }
     const note = (b && b.lines && b.lines[no]) || importNote(ln, f.lang);
     html += '<div class="row ' + band + (note ? " has-note" : "") + (typeof stars !== "undefined" && stars.has(starKey(f, no)) ? " starred" : "") + '" data-l="' + no + '"><span class="band"></span><span class="no">' + no + '</span><span class="tx">' + renderLine(ln, f.lang, doc[i]) + "</span></div>";
     if (inlineNotes && note) {
       const lead = ln.match(/^\s*/)[0];
       const warn = /주의\s*[:：]/.test(note);
-      html += '<div class="row cmt ' + band + (warn ? " warn" : "") + '" data-l="' + no + '"><span class="band"></span><span class="no"></span><span class="tx">' + esc(lead) + cm + plainNote(note) + "</span></div>";
+      html += '<div class="row cmt ' + band + (warn ? " warn" : "") + (think && thinkHidden(f, bi) ? " hn" : "") + '" data-l="' + no + '"><span class="band"></span><span class="no"></span><span class="tx">' + esc(lead) + cm + plainNote(note) + "</span></div>";
     }
   });
   return html;
 }
+function setReadMode(m) {
+  readMode = m; store.set("readMode", m);
+  inlineNotes = m !== "code"; store.set("inlineNotes", inlineNotes);
+  document.body.classList.toggle("rm-think", m === "think");
+  openFile(state.file, state.block, state.line);
+}
+function readModeBar() {
+  const M = [["notes", "📖 해설 보며", "초록 // 줄은 이해를 돕는 한국어 주석이에요. 실제 파일에는 없어요."], ["think", "🙈 먼저 생각하기", "해설을 가려 뒀어요. 줄을 누르면 그 줄 뜻만 열리고, 오른쪽에서 덩어리 설명을 열어 맞혔는지 표시해요. (V 열어 보기)"], ["code", "🧾 코드만", "실제 파일 그대로예요. 줄을 누르면 오른쪽에 뜻이 나와요."]];
+  return '<div class="rm-seg" role="group" aria-label="읽는 방식">' + M.map(([k, l]) => '<button type="button" data-rm="' + k + '" aria-pressed="' + (readMode === k) + '">' + l + "</button>").join("") + "</div>" +
+    '<button type="button" class="btn rm-focus" aria-pressed="' + focusBlk + '" title="고른 덩어리 밖을 흐리게">🎯 집중 보기</button><span class="muted-s">' + (M.find((x) => x[0] === readMode) || M[0])[2] + "</span>";
+}
 function setInlineNotes(on) {
   inlineNotes = on; store.set("inlineNotes", on);
+  readMode = on ? (readMode === "code" ? "notes" : readMode) : "code"; store.set("readMode", readMode);
+  document.body.classList.toggle("rm-think", readMode === "think");
   document.querySelectorAll(".notetoggle").forEach((x) => { x.setAttribute("aria-pressed", on); x.textContent = on ? "한국어 주석 끄기" : "한국어 주석 켜기"; });
   if (!$("#tourView").hidden) { $("#tourCenter").dataset.file = ""; openTour(tourState.id, tourState.step); }
   else openFile(state.file, state.block, state.line);
@@ -1352,7 +1396,7 @@ function renderSide() {
     html += '<button type="button" class="fbtn' + (r === t && t ? " full" : "") + '" data-file="' + esc(f.file) + '" aria-current="' + (f.file === state.file) + '" title="' + esc(f.file) + '">' +
       '<span class="n">' + String(i + 1).padStart(2, "0") + '</span><span class="name">' + esc(f.base) + '</span><span class="pc">' + r + "/" + t + '</span><span class="fbar"><i style="width:' + (t ? r / t * 100 : 0) + '%"></i></span></button>';
   });
-  html += '<div class="hint"><div>번호는 추천 읽기 순서예요.</div><div><span class="kbd">J</span> <span class="kbd">K</span> 다음 · 이전 덩어리</div><div><span class="kbd">N</span> 다음 줄 설명</div><div><label><input type="checkbox" id="termToggle" checked> 용어 밑줄 보기</label></div></div>';
+  html += '<div class="hint"><div>번호는 추천 읽기 순서예요.</div><div><span class="kbd">J</span> <span class="kbd">K</span> 다음 · 이전 덩어리</div><div><span class="kbd">N</span> 다음 줄 설명</div><div><span class="kbd">V</span> 먼저 생각하기에서 열어 보기</div><div><label><input type="checkbox" id="termToggle" checked> 용어 밑줄 보기</label></div></div>';
   $("#side").innerHTML = html;
   $("#side").querySelectorAll(".fbtn").forEach((b) => b.addEventListener("click", () => openFile(b.dataset.file)));
   $("#side").querySelectorAll(".flows button").forEach((b) => b.addEventListener("click", () => switchFlow(b.dataset.flow)));
@@ -1391,23 +1435,28 @@ function openFile(file, block, line) {
   f._lineBlock = lineBlock;
   let html = '<div class="fhead"><div class="path">' + esc(f.path || f.file) + (f.offset ? " · " + (f.offset + 1) + "~" + (f.offset + f.lines.length) + "줄만" : "") + '</div><h2>' + esc(f.base) + '</h2><p class="one">' + rich(f.oneLine) + '</p><p class="role">' + rich(f.role) + "</p>" +
     '<div class="rel"><span class="lab">이 파일이 쓰는 것</span>' + relChips(f.calls) + '</div><div class="rel"><span class="lab">이 파일을 쓰는 곳</span>' + relChips(f.calledBy) + "</div></div>";
-  html += '<div class="code-tools"><span class="rd-fprog" id="fileProg"></span>' + noteToggleBtn() + '<span class="muted-s">초록 // 줄은 이해를 돕는 한국어 주석이에요. 실제 파일에는 없어요.</span></div>';
+  html += '<div class="code-tools"><span class="rd-fprog" id="fileProg"></span>' + readModeBar() + "</div>";
   html += blockMapHtml(f) + '<div class="blocks-nav" id="blocksNav">' + f.blocks.map((b, i) => '<button type="button" data-b="' + i + '" class="' + (readSet.has(rk(f, i)) ? "read" : "") + '">' + (i + 1) + ". " + esc(b.title) + "</button>").join("") + "</div>";
   html += '<div class="code" id="code">';
-  html += codeRows(f, lineBlock);
+  html += codeRows(f, lineBlock, true);
   html += "</div>";
   const center = $("#center");
   center.innerHTML = html;
   center.scrollTop = 0;
   center.querySelectorAll(".chip.link").forEach((c) => c.addEventListener("click", () => openFile(c.dataset.file)));
   center.querySelectorAll(".notetoggle").forEach((x) => x.addEventListener("click", () => setInlineNotes(!inlineNotes)));
+  center.querySelectorAll("[data-rm]").forEach((x) => x.addEventListener("click", () => setReadMode(x.dataset.rm)));
+  center.querySelectorAll(".rm-focus").forEach((x) => x.addEventListener("click", () => { focusBlk = !focusBlk; store.set("focusBlk", focusBlk); document.body.classList.toggle("focusblk", focusBlk); x.setAttribute("aria-pressed", focusBlk); }));
   $("#blocksNav").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => selectBlock(+b.dataset.b, null, true)));
   ixBindBmap(f); ixBmapUpdate(f, -1);
   $("#code").addEventListener("click", (e) => {
     const t = e.target.closest(".term");
     if (t) { e.stopPropagation(); openTerm(t.dataset.term); return; }
     const row = e.target.closest(".row");
-    if (row) { const l = +row.dataset.l; selectBlock(lineBlock[l - 1 - f.offset], l, false); }
+    if (row) {
+      const l = +row.dataset.l; selectBlock(lineBlock[l - 1 - f.offset], l, false);
+      if (readMode === "think") document.querySelectorAll('#code .row.cmt.hn[data-l="' + l + '"]').forEach((x) => x.classList.add("open"));
+    }
   });
   renderSide();
   updateProgress();
@@ -1437,6 +1486,7 @@ function selectBlock(bi, line, scroll) {
     if (readSet.has(rk(f, +x.dataset.b))) x.classList.add("read");
   });
   ixBmapUpdate(f, bi);
+  const codeEl = $("#code"); if (codeEl) codeEl.classList.add("hassel");
   const cur = document.querySelector('#blocksNav button[aria-current="true"]');
   if (cur) scrollInsideX($("#blocksNav"), cur);
   if (scroll) {
@@ -1445,13 +1495,42 @@ function selectBlock(bi, line, scroll) {
   }
   renderPanel(f, bi, line);
 }
+function revealBlock(f, bi) {
+  const b = f.blocks[bi]; revealed.add(rk(f, bi));
+  document.querySelectorAll("#code .row.cmt.hn").forEach((x) => { const l = +x.dataset.l; if (l >= b.start && l <= b.end) x.classList.add("open"); });
+  const ban = document.querySelector('#code .row.banner[data-l="' + b.start + '"] .tx');
+  if (ban) ban.textContent = ban.parentElement.dataset.title;
+  renderPanel(f, bi, state.line);
+}
 const KIND_KO = { header: "머리말", field: "필드", constructor: "생성자", method: "메서드", type: "타입", other: "기타" };
 function renderPanel(f, bi, line) {
   const b = f.blocks[bi];
   const notes = Object.entries(b.lines || {}).map(([k, v]) => [+k, v]).sort((a, c) => a[0] - c[0]);
   let html = '<button class="btn sheet-close" type="button" id="sheetClose">닫기</button>';
   html += '<div><span class="kind">' + (KIND_KO[b.kind] || "덩어리") + '</span> <span class="range">' + (bi + 1) + " / " + f.blocks.length + " · " + b.start + (b.end > b.start ? "~" + b.end : "") + "줄</span></div>";
+  const key = rk(f, bi);
+  if (thinkHidden(f, bi)) {
+    html += "<h3>" + (bi + 1) + "번 덩어리</h3>" +
+      '<div class="rm-cover"><div class="lbl">먼저 생각해 보기</div><p>코드만 보고 이 덩어리가 <b>무엇을 받아 무엇을 하는지</b> 한두 문장으로 말해 보세요. 줄을 누르면 그 줄 뜻만 살짝 열려요.</p>' +
+      '<textarea id="rmMine" placeholder="예: 생성자로 부품 일곱 개를 받아 필드에 넣어 둬요">' + esc(myGuess[key] || "") + '</textarea><button class="btn primary" type="button" id="rmReveal">열어 보기 (V)</button></div>';
+    html += '<div class="navbtns"><button class="btn" type="button" id="prevB"' + (bi === 0 ? " disabled" : "") + '>← 이전 덩어리</button><button class="btn" type="button" id="nextB">건너뛰기 →</button></div>';
+    const p0 = $("#panel");
+    p0.innerHTML = html; p0.classList.remove("closed", "swap"); void p0.offsetWidth; p0.classList.add("swap"); p0.scrollTop = 0;
+    $("#sheetClose").addEventListener("click", () => p0.classList.add("closed"));
+    $("#rmMine").addEventListener("input", (e) => { myGuess[key] = e.target.value; });
+    $("#rmReveal").addEventListener("click", () => revealBlock(f, bi));
+    $("#prevB").addEventListener("click", () => selectBlock(bi - 1, null, true));
+    $("#nextB").addEventListener("click", () => {
+      if (bi < f.blocks.length - 1) selectBlock(bi + 1, null, true);
+      else { const list = flowFiles(f.flow); const idx = list.indexOf(f); if (idx < list.length - 1) openFile(list[idx + 1].file, 0); }
+    });
+    return;
+  }
   html += "<h3>" + esc(b.title) + "</h3>";
+  if (readMode === "think") {
+    html += (myGuess[key] ? '<div class="rm-mine">내 짐작: ' + esc(myGuess[key]) + "</div>" : "") +
+      '<div class="rm-chk"><span>코드만 보고 한 내 짐작이 맞았나요?</span><button type="button" data-sc="ok" aria-pressed="' + (selfChk[key] === "ok") + '">✓ 맞혔어요</button><button type="button" data-sc="miss" aria-pressed="' + (selfChk[key] === "miss") + '">✗ 몰랐어요</button></div>';
+  }
   if (b.sig && (b.sig.in || b.sig.out)) html += '<div class="io"><div class="io-box in"><b>들어오는 것</b><span>' + rich(b.sig.in || "없음") + '</span></div><div class="io-arrow" aria-hidden="true">→</div><div class="io-box out"><b>나가는 것</b><span>' + rich(b.sig.out || "없음") + "</span></div></div>";
   html += '<div class="lbl">이 덩어리가 하는 일</div>' + sayList(b.explain);
   const inTours = stepsTouching(f, b.start, b.end);
@@ -1471,6 +1550,10 @@ function renderPanel(f, bi, line) {
   p.scrollTop = 0;
   if (line) { const c = p.querySelector(".step.cur"); if (c) scrollInside(p, c, "ifneeded"); }
   $("#sheetClose").addEventListener("click", () => p.classList.add("closed"));
+  p.querySelectorAll("[data-sc]").forEach((x) => x.addEventListener("click", () => {
+    selfChk[key] = x.dataset.sc; store.set("selfchk", selfChk);
+    p.querySelectorAll("[data-sc]").forEach((y) => y.setAttribute("aria-pressed", y === x));
+  }));
   p.querySelectorAll(".tourlink").forEach((x) => x.addEventListener("click", () => { showTab("tour"); openTour(x.dataset.tour, +x.dataset.step); }));
   p.querySelectorAll(".step.click").forEach((n) => {
     n.addEventListener("click", (e) => { if (e.target.closest(".tref")) return; selectBlock(bi, +n.dataset.l, true); });
@@ -1569,6 +1652,7 @@ document.addEventListener("keydown", (e) => {
   const f = FILES.find((x) => x.file === state.file);
   if (e.key === "j" || e.key === "J") { selectBlock(state.block == null ? 0 : Math.min(state.block + 1, f.blocks.length - 1), null, true); }
   else if (e.key === "k" || e.key === "K") { if (state.block > 0) selectBlock(state.block - 1, null, true); }
+  else if ((e.key === "v" || e.key === "V") && readMode === "think" && state.block != null && thinkHidden(f, state.block)) revealBlock(f, state.block);
   else if (e.key === "n" || e.key === "N") {
     const all = []; f.blocks.forEach((b, bi) => Object.keys(b.lines || {}).forEach((l) => all.push([+l, bi])));
     all.sort((a, c) => a[0] - c[0]);
@@ -2069,7 +2153,8 @@ function practiceBlock() {
     const pool = [];
     for (const f of pFiles()) f.blocks.forEach((b, bi) => { if (b.explain && b.end - b.start >= 2 && b.end - b.start <= 40 && b.kind !== "header") pool.push({ f, bi }); });
     if (!pool.length) { body.innerHTML = '<p class="empty">문제를 낼 덩어리가 없어요.</p>'; return; }
-    pCur = { kind: "block", item: pick(pool), shown: false };
+    const miss = pool.filter((o) => selfChk[rk(o.f, o.bi)] === "miss");
+    pCur = { kind: "block", item: miss.length && Math.random() < 0.7 ? pick(miss) : pick(pool), shown: false };
   }
   const { f, bi } = pCur.item, b = f.blocks[bi];
   let html = '<div class="p-card"><div class="p-head">' + fileTag(f.path || f.file, ":" + b.start + "~" + b.end) + '<span class="muted-s">' + esc(f.base) + "</span>" + statLine("block") + "</div>";
@@ -2083,6 +2168,7 @@ function practiceBlock() {
   body.innerHTML = html + "</div>";
   wirePractice(() => { pCur.mine = ($("#pAns") || {}).value || ""; pCur.shown = true; practiceBlock(); }, (ok) => {
     addStat("block", pFlow, ok);
+    if (ok && selfChk[rk(f, bi)] === "miss") { selfChk[rk(f, bi)] = "ok"; store.set("selfchk", selfChk); }
     if (!ok) { const k = starKey(f, b.start); if (!stars.has(k)) { stars.add(k); store.set("stars", [...stars]); } }
     pCur = null; practiceBlock();
   }, () => jumpTo(f.path || f.file, b.start, f.flow));
@@ -2474,7 +2560,7 @@ function pxHub() {
   const acc = tot.n ? tot.ok / tot.n : 0;
   const scope = pFlow === "all" ? "모든 흐름" : flowName(pFlow);
   const tile = (ic, v, label, tipText) => '<div class="px-tile"' + (tipText ? tipAttr(tipText) : "") + '><span class="px-tile-ic">' + ic + "</span><b>" + v + "</b><span>" + label + "</span></div>";
-  let h = '<div class="px-hero"><div class="px-hero-main"><span class="px-kicker">오늘의 연습</span><h2>5문제로 오늘 공부 끝내기</h2><p>틀렸던 줄과 별표 친 줄이 먼저 나와요. 줄 뜻 2 · 덩어리 1 · 사전 카드 1 · 흐름 순서 1이에요.</p>' +
+  let h = '<div class="px-hero"><div class="px-hero-main"><span class="px-kicker">오늘의 연습</span><h2>5문제로 오늘 공부 끝내기</h2><p>틀렸던 줄 · 별표 친 줄 · 「몰랐어요」 덩어리가 먼저 나와요. 줄 뜻 2 · 덩어리 1 · 사전 카드 1 · 흐름 순서 1이에요.</p>' +
     '<div class="px-hero-btns"><button type="button" class="px-start" id="pxDaily">▶ 시작하기</button><span class="px-scope-now">범위 <b>' + esc(scope) + "</b>" + (pFlow !== "all" ? ' <button type="button" class="linkish" data-pxf="all">모든 흐름으로</button>' : "") + "</span></div></div>" +
     '<div class="px-stats">' +
     tile("🔥", pxStreak() + "일", "연속 공부", "연습 문제를 하나라도 푼 날이 이어진 수예요") +
@@ -3330,10 +3416,10 @@ function renderReadHub() {
   const cur = FILES.find((x) => x.file === state.file);
   const done = FILES.filter((f) => { const [a, b] = fileProgress(f); return b && a === b; }).length;
   const tile = (ic, v, label) => '<div class="px-tile"><span class="px-tile-ic">' + ic + "</span><b>" + v + "</b><span>" + label + "</span></div>";
-  let h = '<div class="px-hero rd-hero"><div class="px-hero-main rd-main"><span class="px-kicker">코드 읽기</span><h2>실제 코드를 한 줄씩, 한국어로</h2><p>저장소 파일 그대로예요. 줄을 누르면 그 줄의 뜻, 밑줄 단어를 누르면 사전이 나와요. 흐름을 고르면 추천 순서대로 파일이 놓여 있어요.</p>' +
+  let h = '<div class="px-hero rd-hero"><div class="px-hero-main rd-main"><span class="px-kicker">코드 읽기</span><h2>실제 코드를 한 줄씩, 한국어로</h2><p>저장소 파일 그대로예요. 줄을 누르면 그 줄의 뜻, 밑줄 단어를 누르면 사전이 나와요. 익숙해지면 「🙈 먼저 생각하기」로 해설을 가리고 스스로 읽어 보세요.</p>' +
     (cur ? '<div class="px-hero-btns"><button type="button" class="px-start" id="rdResume">▶ 이어 읽기</button><span class="px-scope-now"><b>' + esc(cur.base) + "</b> · " + (ixFirstUnread(cur) + 1) + "번 덩어리부터</span></div>" : "") + "</div>" +
     '<div class="px-stats"><div class="px-tile"><svg class="px-acc" viewBox="-30 -30 60 60"><g transform="rotate(-90)">' + ixRing(T ? R / T : 0, 24, "i") + '</g></svg><b>' + (T ? Math.round(R / T * 100) : 0) + '%</b><span>읽은 덩어리 ' + R + " / " + T + "</span></div>" +
-    tile("📄", FILES.length, "파일 조각") + tile("✅", done, "다 읽은 조각") + tile("🧾", FILES.reduce((a, f) => a + f.lines.length, 0).toLocaleString(), "코드 줄") + tile("⭐", stars.size, "별표 친 줄") + "</div></div>";
+    tile("🙈", Object.values(selfChk).filter((v) => v === "ok").length, "스스로 맞힌 덩어리 · 몰랐던 " + Object.values(selfChk).filter((v) => v === "miss").length) + tile("✅", done, "다 읽은 조각") + tile("🧾", FILES.reduce((a, f) => a + f.lines.length, 0).toLocaleString(), "코드 줄") + tile("⭐", stars.size, "별표 친 줄") + "</div></div>";
   if (CHANGES && (CHANGES.blocks || []).length) {
     const items = CHANGES.blocks.map((x) => { const f = FILES.find((y) => y.file === x.file); const bi = f ? f.blocks.findIndex((b) => b.fp === x.fp) : -1; return { x, f, bi }; }).filter((o) => o.f && o.bi >= 0);
     h += '<h3 class="px-h">🆕 지난번 이후 바뀐 곳 <small>' + esc(CHANGES.sinceLabel || "") + " → " + esc(CHANGES.atLabel || "") + " · 덩어리 " + items.length + "개 · 바뀐 덩어리는 다시 '안 읽음'이 돼요</small></h3><div class=\"rd-changes\">" +
