@@ -1,0 +1,98 @@
+[
+  {
+    "file": "server/src/app.ts",
+    "oneLine": "API 서버의 입구예요. 요청 주소마다 무엇을 할지 정하고 3000번 포트에서 기다려요.",
+    "role": "웹 화면이 보낸 HTTP 요청이 제일 먼저 도착하는 곳이에요. 공통 준비([[middleware]])를 거친 뒤 GET /todos 와 POST /todos 를 todoService 로 넘겨요. 들어온 값을 검사하는 것도 여기서 해요.",
+    "calls": ["todoService.ts"],
+    "calledBy": ["api.ts"],
+    "blocks": [
+      { "start": 1, "end": 4, "title": "import", "kind": "header", "explain": "[[express]] 와 cors, 그리고 우리 todoService 의 함수 두 개를 가져와요.", "lines": {} },
+      {
+        "start": 5, "end": 8, "title": "앱 만들고 공통 준비 붙이기", "kind": "field",
+        "explain": "express 앱을 만들고, 모든 요청에 먼저 적용할 준비 두 가지를 붙여요: 다른 주소(웹)에서 와도 받아 주기(CORS), JSON 본문 읽기.",
+        "lines": {
+          "5": "[[express]] 앱을 만들어요. 테스트에서도 쓰려고 export 해 둬요.",
+          "6": "[[cors]] 를 켜요. 웹(5173 포트)과 서버(3000 포트)는 주소가 달라서, 이게 없으면 브라우저가 응답을 막아요.",
+          "7": "[[middleware]] express.json() 이 본문 JSON 글자를 읽어 req.body 에 객체로 넣어 줘요."
+        }
+      },
+      {
+        "start": 9, "end": 12, "title": "GET /todos — 목록 돌려주기", "kind": "method",
+        "explain": "목록 요청이 오면 todoService 에서 받은 배열을 JSON 으로 돌려줘요.",
+        "lines": {
+          "9": "[[http-method]] GET /todos 요청이 오면 실행할 함수를 등록해요. req 는 들어온 요청, res 는 돌려줄 답이에요.",
+          "10": "getTodos() 결과를 JSON 으로 바꿔 200 과 함께 보내요."
+        }
+      },
+      {
+        "start": 13, "end": 20, "title": "POST /todos — 검사하고 만들기", "kind": "method",
+        "explain": "본문의 title 이 글자인지, 비어 있지 않은지 검사해요. 틀리면 400, 맞으면 할 일을 만들어 201 로 돌려줘요.",
+        "sig": { "in": "본문 { title }", "out": "201 + 새 Todo, 또는 400" },
+        "lines": {
+          "13": "POST /todos 요청을 받는 함수예요. 주의: 로그인 확인이 없어서 주소만 알면 누구나 할 일을 추가할 수 있어요.",
+          "14": "[[optional-chaining]] 으로 body 가 없어도 오류 없이 undefined 를 받아요.",
+          "15": "글자가 아니거나 빈 글자면 거절해요. 웹에서 막아도 서버에서 한 번 더 검사해야 해요(요청은 웹 말고도 보낼 수 있어서).",
+          "16": "[[http-status]] 400(잘못된 요청)과 이유를 돌려주고 함수를 끝내요.",
+          "18": "[[http-status]] 201(새로 만들었음)과 createTodo 가 만든 할 일을 돌려줘요."
+        }
+      },
+      {
+        "start": 21, "end": 22, "title": "포트 열고 기다리기", "kind": "other",
+        "explain": "환경변수 PORT(없으면 3000)번 포트에서 요청을 기다리기 시작해요.",
+        "lines": {
+          "21": "[[env-var]] PORT 가 없으면([[nullish]]) 3000 을 써요. 환경변수는 글자라서 Number 로 숫자로 바꿔요.",
+          "22": "listen 으로 서버를 켜요. 켜지면 'listening on 3000' 을 찍어요."
+        }
+      }
+    ]
+  },
+  {
+    "file": "server/src/todoService.ts",
+    "oneLine": "할 일을 꺼내 주고 새로 만드는 규칙을 모은 파일이에요.",
+    "role": "app.ts 는 요청 · 응답만, 여기는 '할 일을 어떻게 다루나'만 맡아요. 나중에 진짜 DB 로 바꿔도 app.ts 는 그대로 둘 수 있게 나눈 거예요.",
+    "calls": ["db.ts"],
+    "calledBy": ["app.ts"],
+    "blocks": [
+      { "start": 1, "end": 2, "title": "import", "kind": "header", "explain": "메모리 db 와 Todo 타입을 가져와요.", "lines": {} },
+      {
+        "start": 3, "end": 6, "title": "getTodos — 최신 것부터", "kind": "method",
+        "explain": "db 의 배열을 복사한 뒤 번호가 큰 것(최근)부터 정렬해 돌려줘요.",
+        "sig": { "in": "없음", "out": "Todo[]" },
+        "lines": {
+          "3": "Todo 배열을 돌려주는 함수예요.",
+          "4": "[[spread]] 로 배열을 복사한 뒤 sort 해요. 원본을 바로 sort 하면 db 안의 순서가 바뀌어요."
+        }
+      },
+      {
+        "start": 7, "end": 11, "title": "createTodo — 번호 붙여 만들기", "kind": "method",
+        "explain": "다음 번호를 주고, 제목을 200자로 자르고, 끝내지 않은 상태로 만들어 db 에 넣어요.",
+        "sig": { "in": "title(string)", "out": "새 Todo" },
+        "lines": {
+          "7": "제목을 받아 새 Todo 를 돌려줘요.",
+          "8": "nextId++ 는 지금 값을 쓰고 1 올려요(1, 2, 3 …). 제목은 slice 로 200자까지만 남겨요.",
+          "9": "db 배열 끝에 넣어요.",
+          "10": "만든 할 일을 돌려줘요. app.ts 가 이걸 201 응답에 담아요."
+        }
+      }
+    ]
+  },
+  {
+    "file": "server/src/db.ts",
+    "oneLine": "진짜 데이터베이스 대신 메모리에 할 일을 담아 두는 상자예요.",
+    "role": "예시라서 DB 없이 자바스크립트 객체 하나로 저장해요. 서버를 끄면 전부 사라져요.",
+    "calls": [],
+    "calledBy": ["todoService.ts"],
+    "blocks": [
+      { "start": 1, "end": 2, "title": "Todo 모양", "kind": "type", "explain": "할 일 하나의 모양이에요. 웹의 api.ts 와 같은 모양을 서버에도 따로 적어 뒀어요.", "lines": { "1": "[[type-alias]] Todo: 번호 · 제목 · 끝냈는지." } },
+      {
+        "start": 3, "end": 7, "title": "메모리 저장소", "kind": "field",
+        "explain": "다음에 줄 번호와 할 일 배열을 담은 객체예요. 주의: 서버 프로그램이 꺼지면 이 객체도 사라져서 할 일이 전부 없어져요.",
+        "lines": {
+          "4": "export 해서 todoService 가 쓰게 해요. const 라도 안의 칸은 바꿀 수 있어요.",
+          "5": "다음 할 일에 줄 번호예요. 1부터 시작해요.",
+          "6": "할 일 배열이에요. 빈 배열 [] 은 타입을 알 수 없어서 as Todo[] 로 알려 줘요."
+        }
+      }
+    ]
+  }
+]

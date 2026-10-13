@@ -1,0 +1,7 @@
+{
+  "name": "codebase-anatomy",
+  "version": "0.1.0",
+  "description": "Analyze a codebase from its actual source and publish an interactive anatomy guide: structure, request traces, security from zero, data model, git history, and an honest defect list with evidence.",
+  "license": "MIT",
+  "keywords": ["architecture", "onboarding", "audit", "artifact"]
+}

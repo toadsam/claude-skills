@@ -1,0 +1,525 @@
+<title>{{프로젝트명}} 해설서</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+/* ── 팔레트: 프로젝트마다 --accent 계열만 바꾼다 (light / dark 두 벌 모두). 나머지 토큰은 그대로 둔다 ── */
+:root{
+  --paper:#f6f2f4; --panel:#ffffff; --ink:#1c1017; --muted:#6b5a63; --line:#e3d7dd;
+  --accent:#c9256f; --accent-soft:#fbe4ef; --ok:#1f8a4c; --ok-soft:#e1f3e8;
+  --bad:#c23b3b; --bad-soft:#fae2e2; --warn:#a86a0b; --warn-soft:#fbeed3;
+  --code-bg:#1e0a1a; --code-ink:#f3e6ec; --code-cm:#a97f95; --code-hi:rgba(244,114,182,.22);
+  --on-sem:#ffffff;
+  --sans:"IBM Plex Sans KR","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --display:"Black Han Sans","IBM Plex Sans KR","Noto Sans KR",sans-serif;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#140510; --panel:#1e0a1a; --ink:#f3e6ec; --muted:#b08ea0; --line:#3a1f31;
+    --accent:#f472b6; --accent-soft:#3a1530; --ok:#4ade80; --ok-soft:#12301f;
+    --bad:#f87171; --bad-soft:#3a1717; --warn:#fbbf24; --warn-soft:#3a2b0e;
+    --code-bg:#0f040c; --code-ink:#f3e6ec; --code-cm:#8a5f7a; --code-hi:rgba(244,114,182,.28);
+    --on-sem:#140510;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#140510; --panel:#1e0a1a; --ink:#f3e6ec; --muted:#b08ea0; --line:#3a1f31;
+  --accent:#f472b6; --accent-soft:#3a1530; --ok:#4ade80; --ok-soft:#12301f;
+  --bad:#f87171; --bad-soft:#3a1717; --warn:#fbbf24; --warn-soft:#3a2b0e;
+  --code-bg:#0f040c; --code-ink:#f3e6ec; --code-cm:#8a5f7a; --code-hi:rgba(244,114,182,.28);
+    --on-sem:#140510;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.75;word-break:keep-all}
+a{color:var(--accent)}
+h1,h2,h3,h4{text-wrap:balance;margin:0}
+p{margin:0}
+ul,ol{margin:0;padding-left:1.3em}
+li{margin:2px 0}
+code{font-family:var(--mono);font-size:.88em;background:var(--accent-soft);padding:.05em .35em;border-radius:3px}
+button{font:inherit;cursor:pointer}
+button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+em{font-style:normal;color:var(--accent);font-weight:500}
+
+.wrap{max-width:1180px;margin:0 auto;padding:32px 20px 80px}
+.masthead{border-bottom:3px solid var(--ink);padding-bottom:22px;margin-bottom:28px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.masthead h1{font-family:var(--display);font-size:clamp(40px,7vw,68px);line-height:1.05;letter-spacing:-.01em;margin-top:6px}
+.masthead .lede{max-width:66ch;margin-top:14px;font-size:17px}
+.legend{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:16px;font-size:13px;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.legend .l-real::before{background:var(--ok)}
+.legend .l-demo::before{background:var(--accent)}
+.legend .l-todo::before{background:var(--warn)}
+.legend .l-check::before{background:var(--bad)}
+
+.layout{display:grid;grid-template-columns:210px minmax(0,1fr);gap:40px;align-items:start}
+.rail{position:sticky;top:16px;display:flex;flex-direction:column;gap:2px;font-size:13px}
+.rail a{color:var(--muted);text-decoration:none;padding:5px 8px;border-left:2px solid var(--line);display:flex;gap:8px}
+.rail a b{font-family:var(--mono);font-weight:400;color:var(--accent);min-width:2ch}
+.rail a:hover,.rail a.on{color:var(--ink);border-left-color:var(--accent)}
+.rail .rail-h{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--muted);padding:8px 8px 6px}
+.main{max-width:780px;display:flex;flex-direction:column;gap:64px}
+
+.lv{scroll-margin-top:16px}
+.lv-head{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:18px}
+.lv-head .n{font-family:var(--mono);color:var(--accent);font-size:14px}
+.lv-head h2{font-family:var(--display);font-size:30px;line-height:1.15;font-weight:400}
+.lv-head .tag{margin-left:auto;font-size:12px;color:var(--muted);white-space:nowrap}
+.oneline{font-size:18px;font-weight:500;border-left:4px solid var(--accent);padding:6px 16px;margin-bottom:16px;background:var(--panel)}
+.oneline small{display:block;font-size:12px;color:var(--accent);font-family:var(--mono);letter-spacing:.08em;margin-bottom:2px}
+h3.sub{font-size:13px;font-family:var(--mono);letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin:22px 0 8px;padding-top:6px;border-top:1px dashed var(--line)}
+.body{display:flex;flex-direction:column;gap:12px;max-width:68ch}
+.analogy{background:var(--accent-soft);padding:12px 16px;border-radius:4px}
+.analogy b{color:var(--accent)}
+.ours{border:1px solid var(--line);border-left:4px solid var(--ok);background:var(--panel);padding:12px 16px;border-radius:4px;display:flex;flex-direction:column;gap:6px}
+.ours b.h{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;color:var(--ok)}
+
+.lab{margin-top:18px;border:1px solid var(--line);background:var(--panel);border-radius:6px;overflow:hidden}
+.lab-h{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px}
+.lab-h .pill{font-family:var(--mono);font-size:11px;letter-spacing:.08em;padding:2px 7px;border-radius:3px;color:#fff;background:var(--accent)}
+.lab-b{padding:14px}
+.btn{border:1px solid var(--ink);background:var(--ink);color:var(--paper);padding:7px 14px;border-radius:4px;font-size:14px;font-weight:500}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.switch{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--line);border-radius:4px;font-size:14px;background:transparent;color:var(--ink)}
+.switch i{width:30px;height:16px;border-radius:8px;background:var(--line);position:relative;transition:background .15s}
+.switch i::after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--panel);transition:left .15s}
+.switch[aria-pressed="true"] i{background:var(--ok)}
+.switch[aria-pressed="true"] i::after{left:16px}
+.log{font-family:var(--mono);font-size:12.5px;line-height:1.6;background:var(--code-bg);color:var(--code-ink);padding:10px 12px;border-radius:4px;min-height:52px;white-space:pre-wrap;margin-top:10px}
+.log .k{color:var(--code-cm)}
+.log .ok{color:var(--ok)} .log .bad{color:var(--bad)} .log .warn{color:var(--warn)}
+.note{font-size:13.5px;color:var(--muted);margin-top:10px}
+
+.lanes{display:flex;flex-direction:column;gap:6px;margin-top:12px;font-family:var(--mono);font-size:12.5px}
+.lane{display:grid;grid-template-columns:110px 1fr 90px;gap:8px;align-items:center}
+.lane .bar{height:18px;border-radius:3px;background:var(--line);position:relative;overflow:hidden}
+.lane .bar i{position:absolute;inset:0;width:0;transition:width .5s linear}
+.lane .bar i.b401{background:var(--warn)} .lane .bar i.bref{background:var(--accent)} .lane .bar i.bwait{background:repeating-linear-gradient(90deg,var(--line) 0 6px,var(--muted) 6px 8px)} .lane .bar i.bok{background:var(--ok)} .lane .bar i.bbad{background:var(--bad)}
+.lane .st{text-align:right;font-weight:700}
+.lane .st.ok{color:var(--ok)} .lane .st.bad{color:var(--bad)} .lane .st.w{color:var(--muted)}
+
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:12px}
+.step{border:1px solid var(--line);border-radius:4px;padding:8px;font-size:12.5px;line-height:1.4;opacity:.45;transition:opacity .2s,border-color .2s}
+.step.on{opacity:1;border-color:var(--accent);background:var(--accent-soft)}
+.step b{display:block;font-size:13px}
+.lamps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
+.lamp{text-align:center;border:1px solid var(--line);border-radius:4px;padding:8px 4px;font-size:12.5px}
+.lamp i{display:block;width:12px;height:12px;border-radius:50%;background:var(--line);margin:0 auto 6px}
+.lamp.on i{background:var(--ok)} .lamp.off i{background:var(--bad)}
+
+.code{font-family:var(--mono);font-size:12.5px;line-height:1.65;background:var(--code-bg);color:var(--code-ink);padding:12px 14px;border-radius:4px;overflow-x:auto;margin-top:10px}
+.code .cm{color:var(--code-cm)} .code .hi{background:var(--code-hi);display:inline-block;width:100%}
+.code .fn{color:var(--code-cm);font-size:11px;letter-spacing:.06em;display:block;margin-bottom:4px}
+
+.qa-list{display:flex;flex-direction:column;gap:8px}
+details.qa{border:1px solid var(--line);border-radius:6px;background:var(--panel)}
+details.qa summary{cursor:pointer;padding:10px 14px;font-weight:500;list-style:none;display:flex;gap:10px;align-items:baseline}
+details.qa summary::-webkit-details-marker{display:none}
+details.qa summary .t{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;padding:2px 6px;border-radius:3px;white-space:nowrap;color:#fff}
+.t.t1{background:var(--ok)} .t.t2{background:var(--accent)} .t.t3{background:var(--bad)}
+details.qa .a{padding:0 14px 14px;font-size:15px;display:flex;flex-direction:column;gap:8px}
+details.qa .a .ans{border-left:3px solid var(--accent);padding:4px 12px}
+details.qa .a .tip{font-size:13.5px;color:var(--muted)}
+details.qa .a .tip b{color:var(--warn)}
+
+.honest{margin-top:14px;padding:12px 16px;background:var(--warn-soft);border-radius:4px;font-size:14.5px}
+.honest b{color:var(--warn)}
+.check{margin-top:14px;padding:12px 16px;border:1px solid var(--bad);border-radius:4px;font-size:14.5px;background:var(--panel)}
+.check b.h{display:block;font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;color:var(--bad);margin-bottom:6px}
+.check label{display:flex;gap:8px;align-items:flex-start;margin:4px 0;cursor:pointer}
+.check input{margin-top:6px;accent-color:var(--bad)}
+
+.tbl{width:100%;border-collapse:collapse;font-size:14px;margin-top:12px}
+.tbl th,.tbl td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl th{font-size:12px;letter-spacing:.06em;color:var(--muted);font-weight:500}
+.tbl-wrap{overflow-x:auto}
+
+.stack{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.stack button{text-align:left;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:4px;padding:10px;font-size:13.5px;line-height:1.4}
+.stack button b{display:block;font-family:var(--mono);font-size:12px;color:var(--accent)}
+.stack button.on{border-color:var(--accent);background:var(--accent-soft)}
+
+details.acc{border:1px solid var(--line);border-radius:4px;margin-top:8px;background:var(--panel)}
+details.acc summary{cursor:pointer;padding:10px 14px;font-weight:500;list-style:none}
+details.acc summary::-webkit-details-marker{display:none}
+details.acc summary::before{content:"+";font-family:var(--mono);color:var(--accent);margin-right:10px}
+details[open].acc summary::before{content:"–"}
+details.acc .acc-b{padding:0 14px 14px;display:grid;gap:8px;font-size:14.5px}
+.acc-b .r{display:grid;grid-template-columns:56px 1fr;gap:10px}
+.acc-b .r b{font-family:var(--mono);font-size:12px;letter-spacing:.06em}
+.acc-b .r b.s{color:var(--bad)} .acc-b .r b.c{color:var(--warn)} .acc-b .r b.f{color:var(--ok)}
+
+.edges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.edge{border:1px solid var(--line);border-radius:4px;padding:10px;text-align:center;font-size:13px}
+.edge .v{font-family:var(--display);font-size:26px;line-height:1;margin:4px 0}
+.edge.old .v{color:var(--warn)} .edge.new .v{color:var(--ok)}
+.hops{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:12px}
+.hop{border:1px solid var(--line);border-radius:4px;padding:8px;font-size:12px;line-height:1.4;opacity:.45;transition:opacity .2s,border-color .2s}
+.hop.on{opacity:1;border-color:var(--accent);background:var(--accent-soft)}
+.hop b{display:block;font-family:var(--mono);font-size:12px}
+.hop small{color:var(--muted)}
+.idx{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.idx .box{border:1px solid var(--line);border-radius:4px;padding:10px;font-size:13.5px}
+.idx .box .num{font-family:var(--display);font-size:34px;line-height:1;font-variant-numeric:tabular-nums;margin:6px 0 2px}
+.idx .box.slow .num{color:var(--bad)} .idx .box.fast .num{color:var(--ok)}
+
+.jwt{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:12px;font-family:var(--mono);font-size:12px}
+.jwt div{padding:8px;border-radius:4px;border:1px solid var(--line);word-break:break-all}
+.jwt .h{border-color:var(--warn)} .jwt .p{border-color:var(--accent)} .jwt .s{border-color:var(--ok)}
+.jwt b{display:block;font-size:11px;letter-spacing:.08em;margin-bottom:4px}
+.jwt .h b{color:var(--warn)} .jwt .p b{color:var(--accent)} .jwt .s b{color:var(--ok)}
+
+.gloss{margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:8px 18px;font-size:14px}
+.gloss dt{font-weight:700;color:var(--accent);font-family:var(--mono);font-size:13px}
+.gloss dd{margin:0 0 4px}
+
+.drill{border:1px solid var(--line);border-radius:6px;background:var(--panel);padding:16px;margin-top:12px}
+.drill .meta{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:13px;color:var(--muted);align-items:center}
+.drill .meta select{font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line);border-radius:4px;background:var(--paper);color:var(--ink)}
+.drill .card{margin-top:14px;min-height:120px}
+.drill .card .q{font-size:19px;font-weight:500;line-height:1.5}
+.drill .card .lvl{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--accent);margin-bottom:6px}
+.drill .card .ans{margin-top:12px;border-left:3px solid var(--accent);padding:6px 12px;font-size:15px}
+.drill .card .ans[hidden]{display:none}
+.drill .acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.drill .bar{height:6px;background:var(--line);border-radius:3px;margin-top:12px;overflow:hidden}
+.drill .bar i{display:block;height:100%;background:var(--ok);width:0;transition:width .3s}
+
+.strategy{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.strategy .box{border:1px solid var(--line);border-radius:4px;padding:12px 14px;font-size:14.5px;background:var(--panel)}
+.strategy .box b.h{display:block;font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;color:var(--accent);margin-bottom:4px}
+
+figure{margin:14px 0 0}
+figure svg{max-width:100%;height:auto;display:block}
+figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+
+@media (max-width:860px){
+  .layout{grid-template-columns:1fr;gap:20px}
+  .rail{position:static;flex-direction:row;overflow-x:auto;gap:4px;padding-bottom:6px}
+  .rail .rail-h{display:none}
+  .rail a{border-left:0;border-bottom:2px solid var(--line);white-space:nowrap}
+  .rail a.on{border-bottom-color:var(--accent)}
+  .steps,.hops{grid-template-columns:repeat(2,1fr)}
+  .stack,.gloss,.strategy,.jwt{grid-template-columns:1fr}
+  .lane{grid-template-columns:86px 1fr 70px}
+}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important} }
+
+/* ── 추가: 팀 프로젝트 기여 표시 ── */
+.legend .l-team::before{background:var(--muted)}
+.by{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.04em;padding:1px 7px;border-radius:3px;border:1px solid var(--line);color:var(--muted);vertical-align:2px;white-space:nowrap;font-weight:400}
+.by.me{color:var(--ok);border-color:var(--ok);background:var(--ok-soft)}
+.by.team{color:var(--muted)}
+.lv-head .by{margin-left:6px}
+.who-tbl td:first-child{white-space:nowrap}
+/* ── 추가: 확인 항목 진행도 ── */
+.check .prog{float:right;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.rail a i{margin-left:auto;font-style:normal;font-family:var(--mono);font-size:10.5px;color:var(--ok)}
+/* ── 추가: 포트폴리오 ↔ 저장소 대조 블록 ── */
+.lab-h .pill,details.qa summary .t{color:var(--on-sem,#fff)}
+.legend .l-gap::before{background:var(--warn)}
+.claim{margin-top:18px;border:1px solid var(--line);border-radius:6px;background:var(--panel);overflow:hidden}
+.claim-h{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;color:var(--muted)}
+.claim-h b{color:var(--warn);font-weight:700}
+.claim .tbl{margin:0}
+.claim .tbl td:last-child{white-space:nowrap}
+.vd{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:700;padding:1px 7px;border-radius:3px}
+.vd.same{color:var(--ok);background:var(--ok-soft)}
+.vd.diff{color:var(--warn);background:var(--warn-soft)}
+.vd.none{color:var(--bad);background:var(--bad-soft)}
+.claim .say{padding:10px 14px;border-top:1px solid var(--line);font-size:14.5px}
+.claim .say b{color:var(--accent)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.seg button{border:0;background:transparent;color:var(--ink);padding:6px 12px;font-size:13.5px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+</style>
+
+<!--
+  ════════════════════════════════════════════════════════════════════
+  해설서 템플릿. {{ }} 는 전부 채우거나 지운다. 이 주석 블록은 발행 전에 지운다.
+  칸(section.lv) 하나의 완전한 예시가 아래 lv01 이다. 복사해서 칸을 늘린다.
+  블록 쓰는 법: references/section-recipe.md · 실험 패턴: references/labs.md
+  ════════════════════════════════════════════════════════════════════
+-->
+<div class="wrap">
+<header class="masthead">
+  <div class="eyebrow">{{출처 · 프로젝트명 · N칸 풀이 · 면접 대응판}}</div>
+  <h1>{{프로젝트명}} 해설서</h1>
+  <p class="lede">{{각 칸이 무슨 문제를, 왜, 어떻게 풀었는지 바닥 원리부터 다시 풀고, 면접관이 던질 질문을 기본 → 꼬리 → 압박 세 단계로 미리 답해 둔 문서. 코드에 없는 것을 있다고 말하지 않도록 칸마다 확인 항목을 따로 뒀다는 문장으로 끝낸다.}}</p>
+  <div class="legend">
+    <span class="l-real">우리 코드 · 저장소에 실제로 있는 구현</span>
+    <span class="l-demo">재현 · 설명용 실험(실제 서버 호출 없음)</span>
+    <span class="l-todo">아직 안 한 것 · 스스로 밝히는 미완</span>
+    <span class="l-check">면접 전 확인 · 저장소에서 직접 봐야 하는 것</span>
+    <!-- 포트폴리오 대조가 있을 때만 --><span class="l-gap">포트폴리오와 다름 · 포트폴리오 주장이 저장소와 어긋나는 곳</span>
+    <!-- 팀 프로젝트일 때만 --><span class="l-team">팀원 담당 · 내가 만들지 않은 부분</span>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="rail" aria-label="칸 목록">
+  <div class="rail-h">시작</div>
+  <a href="#howto"><b>—</b>답하는 법</a>
+  <div class="rail-h">LEVEL</div>
+  <a href="#lv01"><b>01</b>{{칸 이름}}</a>
+  <!-- 칸마다 한 줄 -->
+  <div class="rail-h">훈련</div>
+  <a href="#gloss"><b>—</b>용어 사전</a>
+  <a href="#drill"><b>—</b>모의 면접 카드</a>
+</nav>
+
+<main class="main">
+
+<!-- ── 답하는 법 ── -->
+<section class="lv" id="howto">
+  <div class="lv-head"><span class="n">—</span><h2>답하는 법</h2><span class="tag">칸에 들어가기 전에</span></div>
+  <div class="body">
+    <p>{{포트폴리오 질문이 오는 순서(뭘 만들었나 → 왜 → 다른 방법은 → 뭐가 문제였나 → 다시 하면)와, 이 문서가 기본·꼬리·압박으로 나뉜 이유.}}</p>
+  </div>
+  <div class="strategy">
+    <div class="box"><b class="h">답의 뼈대 4단</b>{{문제 → 원인 → 해결 → 배운 것}}</div>
+    <div class="box"><b class="h">모를 때 하는 말</b>{{지어내지 않는 문장 하나}}</div>
+    <div class="box"><b class="h">숫자를 말할 때</b>{{이 프로젝트가 실제로 측정한 것 / 측정하지 않은 것}}</div>
+    <div class="box"><b class="h">가장 강한 카드 둘</b>{{칸 번호를 붙여 두 개. 「가장 어려웠던 점」엔 ①, 「○○ 관점」엔 ②}}</div>
+    <!-- 팀 프로젝트면 박스 하나 더: 「내 몫과 팀 몫」 — 무엇을 '제가', 무엇을 '팀이'라고 말하는지 -->
+  </div>
+</section>
+
+<!-- ── 칸 예시 (모든 블록 포함). 필요 없는 블록은 지운다 ── -->
+<section class="lv" id="lv01">
+  <div class="lv-head"><span class="n">01</span><h2>{{칸 이름}}</h2><span class="by me">내 담당</span><span class="tag">{{출처 칸 이름 · 부제}}</span></div>
+  <div class="oneline"><small>한 줄로</small>{{이 칸을 한 문장으로. 기능 설명이 아니라 문제와 선택}}</div>
+  <div class="body">
+    <p>{{무슨 문제였나. 왜 그게 문제인가.}}</p>
+    <p><strong>바닥 원리.</strong> {{이 칸을 이해하는 데 막히는 개념을 처음 듣는 사람 기준으로 세운다. 용어는 <em>강조</em>하고 용어 사전에 올린다.}}</p>
+    <div class="analogy"><b>비유</b> {{일상 사물 하나로}}</div>
+  </div>
+
+  <div class="lab">
+    <div class="lab-h"><span class="pill">재현</span>{{실험 제목 · 무엇을 눌러 보는지}}</div>
+    <div class="lab-b">
+      <!-- 범용 단계 실험: data-stepper. 각 .step 의 data-msg 가 로그에 찍힌다. JS 불필요 -->
+      <div data-stepper>
+        <div class="row"><button class="btn js-next">다음 단계 ▶</button><button class="btn ghost js-reset">되돌리기</button></div>
+        <div class="steps">
+          <div class="step" data-msg="&lt;span class=&quot;ok&quot;&gt;POST /api/…&lt;/span&gt; → {{설명}}"><b>① {{단계}}</b>{{내용}}<br><small>{{파일/엔드포인트}}</small></div>
+          <div class="step" data-msg="{{…}}"><b>② {{단계}}</b>{{내용}}</div>
+        </div>
+        <div class="log" data-empty="// 아직 아무 요청도 나가지 않았습니다"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="code"><span class="fn">{{경로/파일.java:줄 · 우리 코드}}</span><span class="cm">// {{이 코드가 하는 일}}</span>
+{{실제 코드 5~12줄. 핵심 줄은 span.hi 로 감싼다. 꺾쇠와 앰퍼샌드는 이스케이프}}</div>
+
+  <!-- 포트폴리오·발표자료가 있을 때만: 주장과 저장소 대조 -->
+  <div class="claim">
+    <div class="claim-h"><b>포트폴리오 ↔ 저장소</b></div>
+    <div class="tbl-wrap"><table class="tbl">
+      <tr><th>포트폴리오</th><th>저장소</th><th>판정</th></tr>
+      <tr><td>{{포트폴리오 주장}}</td><td>{{코드 사실, 파일·커밋}}</td><td><span class="vd same">일치</span> / <span class="vd diff">다름</span> / <span class="vd none">없음</span></td></tr>
+    </table></div>
+    <div class="say"><b>이렇게 말하세요.</b> {{저장소 기준 한 문장}}</div>
+  </div>
+
+  <div class="honest"><b>정직 표시</b> {{측정하지 않은 것, 아직 안 한 것, 근거 커밋 해시}}</div>
+
+  <h3 class="sub">다시 한다면 · 방법 비교</h3>
+  <div class="tbl-wrap"><table class="tbl">
+    <tr><th>방법</th><th>어떻게</th><th>막는 것</th><th>못 막는 것 · 비용</th></tr>
+    <tr><td><strong>{{지금 방식}}</strong></td><td>…</td><td>…</td><td>…</td></tr>
+  </table></div>
+
+  <h3 class="sub">예상 질문</h3>
+  <div class="qa-list">
+    <details class="qa"><summary><span class="t t1">기본</span>{{질문}}</summary><div class="a"><div class="ans">{{1인칭으로 소리 내 말할 수 있는 답. 3~5문장}}</div></div></details>
+    <details class="qa"><summary><span class="t t2">꼬리</span>{{질문}}</summary><div class="a"><div class="ans">{{답}}</div><div class="tip"><b>팁</b> {{다음에 올 질문, 확인할 파일}}</div></div></details>
+    <details class="qa"><summary><span class="t t3">압박</span>{{질문}}</summary><div class="a"><div class="ans">{{약점을 인정하고 → 이유 → 지금 다시 한다면}}</div></div></details>
+  </div>
+  <div class="check"><b class="h">면접 전 확인</b>
+    <label><input type="checkbox">{{저장소에서 직접 봐야 답할 수 있는 것. 파일 경로 포함}}</label>
+  </div>
+</section>
+
+<!-- ── 결과 · 회고 (마지막 칸) ── -->
+<section class="lv" id="lvEnd">
+  <div class="lv-head"><span class="n">{{NN}}</span><h2>결과 · 회고</h2><span class="tag">진짜와 재현 구분 · 종합 질문</span></div>
+  <div class="oneline"><small>한 줄로</small>{{}}</div>
+  <div class="tbl-wrap"><table class="tbl">
+    <tr><th>이 문서/발표에 있는 것</th><th>성격</th></tr>
+    <tr><td>{{코드 조각 목록}}</td><td><span style="color:var(--ok);font-weight:700">실제 코드</span></td></tr>
+    <tr><td>{{예시 값}}</td><td><span style="color:var(--accent);font-weight:700">설명용 예시</span></td></tr>
+    <tr><td>{{사용자 수 · 성능 수치 등}}</td><td>측정하지 않아 <strong>적지 않음</strong></td></tr>
+  </table></div>
+  <!-- 팀 프로젝트: 누가 무엇을 (git 근거) -->
+  <div class="tbl-wrap"><table class="tbl who-tbl">
+    <tr><th>사람</th><th>맡은 것</th><th>근거 커밋</th></tr>
+    <tr><td><span class="by me">나</span></td><td>{{}}</td><td><code>{{hash}}</code></td></tr>
+  </table></div>
+  <div class="honest"><b>아직 안 한 것</b> {{}}</div>
+  <h3 class="sub">종합 질문 · 프로젝트 전체를 묻는 것들</h3>
+  <div class="qa-list">
+    <details class="qa"><summary><span class="t t1">기본</span>30초로 요약해 주세요.</summary><div class="a"><div class="ans">{{}}</div></div></details>
+    <details class="qa"><summary><span class="t t1">기본</span>가장 어려웠던 점은요?</summary><div class="a"><div class="ans">{{}}</div></div></details>
+    <details class="qa"><summary><span class="t t2">꼬리</span>다시 처음부터 한다면 무엇을 바꾸나요?</summary><div class="a"><div class="ans">{{}}</div></div></details>
+    <details class="qa"><summary><span class="t t3">압박</span>본인이 정말 이해하고 짠 부분과 도움을 받은 부분을 구분해 주세요.</summary><div class="a"><div class="ans">{{}}</div></div></details>
+  </div>
+</section>
+
+<!-- ── 용어 사전 ── -->
+<section class="lv" id="gloss">
+  <div class="lv-head"><span class="n">—</span><h2>용어 사전</h2><span class="tag">문서에 나오는 순서대로</span></div>
+  <dl class="gloss">
+    <dt>{{용어}}</dt><dd>{{한 줄. 비유가 있으면 비유로}}</dd>
+  </dl>
+</section>
+
+<!-- ── 모의 면접 카드 (문서의 모든 details.qa 를 자동으로 카드로 만든다) ── -->
+<section class="lv" id="drill">
+  <div class="lv-head"><span class="n">—</span><h2>모의 면접 카드</h2><span class="tag">무작위 · 답 가리고 소리 내서</span></div>
+  <div class="body">
+    <p>위의 예상 질문이 전부 카드로 들어 있습니다. 질문을 보고 <strong>소리 내서 답한 뒤</strong> 답을 펼쳐 비교하세요. 「자신 있음」으로 표시한 카드는 다음부터 덜 나오고, 진행은 이 브라우저에만 저장됩니다.</p>
+  </div>
+  <div class="drill">
+    <div class="meta">
+      <label>범위 <select id="d-filter"><option value="all">전체</option><option value="t1">기본만</option><option value="t2">꼬리만</option><option value="t3">압박만</option></select></label>
+      <span id="d-count">—</span>
+      <button class="btn ghost" id="d-reset" style="margin-left:auto;font-size:12.5px;padding:4px 10px">진행 초기화</button>
+    </div>
+    <div class="bar"><i id="d-bar"></i></div>
+    <div class="card">
+      <div class="lvl" id="d-lvl"></div>
+      <div class="q" id="d-q">카드를 뽑는 중…</div>
+      <div class="ans" id="d-a" hidden></div>
+    </div>
+    <div class="acts">
+      <button class="btn" id="d-show">답 보기</button>
+      <button class="btn ghost" id="d-ok">자신 있음 ✓</button>
+      <button class="btn ghost" id="d-again">다시 볼 것</button>
+      <button class="btn ghost" id="d-next">다음 카드 →</button>
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+</div>
+
+<!-- ════ 공용 스크립트: 수정하지 않는다. STORE_KEY 만 프로젝트마다 바꾼다 ════ -->
+<script>
+(function(){
+  var STORE_KEY = "{{project-slug}}-guide";
+  var $=function(s,r){return (r||document).querySelector(s)};
+  var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+  var reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function log(el,html){el.innerHTML=html}
+  function add(el,html){el.innerHTML+=html}
+  function wait(ms){ return new Promise(function(r){setTimeout(r,reduced?0:ms)}) }
+  function load(k){ try{ return JSON.parse(localStorage.getItem(STORE_KEY+"-"+k)||"{}")||{} }catch(e){ return {} } }
+  function save(k,v){ try{ localStorage.setItem(STORE_KEY+"-"+k,JSON.stringify(v)) }catch(e){} }
+  window.G={$:$,$$:$$,log:log,add:add,wait:wait,reduced:reduced};
+
+  /* 목차 하이라이트 */
+  var links=$$(".rail a"), secs=$$(".lv");
+  if("IntersectionObserver" in window){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ links.forEach(function(a){a.classList.toggle("on",a.getAttribute("href")==="#"+e.target.id)}) } });
+    },{rootMargin:"-20% 0px -70% 0px"});
+    secs.forEach(function(s){io.observe(s)});
+  }
+
+  /* 범용 단계 실험 [data-stepper] */
+  $$("[data-stepper]").forEach(function(root){
+    var steps=$$(".step",root), L=$(".log",root), next=$(".js-next",root), reset=$(".js-reset",root), i=-1;
+    var label=next?next.textContent:"다음 단계 ▶";
+    function render(){
+      steps.forEach(function(s,k){s.classList.toggle("on",k<=i)});
+      if(next){ next.disabled=i>=steps.length-1; next.textContent=i>=steps.length-1?"끝":label; }
+      L.innerHTML = i<0 ? '<span class="k">'+(L.dataset.empty||"//")+'</span>' : (steps[i].dataset.msg||"");
+    }
+    if(next) next.addEventListener("click",function(){ if(i<steps.length-1){i++;render()} });
+    if(reset) reset.addEventListener("click",function(){i=-1;render()});
+    render();
+  });
+
+  /* 범용 선택 실험 .stack[data-picker] : button[data-msg] 를 누르면 같은 lab-b 안 .log 에 찍힘 */
+  $$(".stack[data-picker]").forEach(function(root){
+    var L=root.parentNode.querySelector(".log");
+    $$("button",root).forEach(function(b){b.addEventListener("click",function(){
+      $$("button",root).forEach(function(x){x.classList.toggle("on",x===b)});
+      L.innerHTML=b.dataset.msg||"";
+    })});
+  });
+
+  /* 범용 스위치: .switch[data-on][data-off] — 누르면 aria-pressed·라벨이 바뀌고 "flip" 이벤트(detail=true/false)를 낸다 */
+  $$(".switch[data-on]").forEach(function(b){b.addEventListener("click",function(){
+    var v=b.getAttribute("aria-pressed")!=="true"; b.setAttribute("aria-pressed",String(v));
+    b.lastChild.textContent=v?b.dataset.on:b.dataset.off;
+    b.dispatchEvent(new CustomEvent("flip",{detail:v}));
+  })});
+
+  /* 면접 전 확인: 체크 상태 저장 + 진행도 + 목차에 완료 표시 */
+  var checks=load("checks");
+  $$(".check").forEach(function(box){
+    var sec=box.closest(".lv"), id=sec?sec.id:"x", inputs=$$("input[type=checkbox]",box);
+    var prog=document.createElement("span"); prog.className="prog"; box.querySelector(".h").appendChild(prog);
+    function upd(){
+      var n=inputs.filter(function(x){return x.checked}).length; prog.textContent=n+" / "+inputs.length;
+      var a=$('.rail a[href="#'+id+'"]'); if(a){ var m=$("i",a)||a.appendChild(document.createElement("i")); m.textContent=n===inputs.length?"✓":""; }
+    }
+    inputs.forEach(function(x,k){ var key=id+":"+k; x.checked=!!checks[key];
+      x.addEventListener("change",function(){ checks[key]=x.checked; save("checks",checks); upd(); }); });
+    upd();
+  });
+
+  /* 모의 면접 카드: 문서의 모든 details.qa 에서 자동 생성 */
+  var cards=[];
+  $$("details.qa").forEach(function(d,i){
+    var sec=d.closest(".lv"), lvl=sec?sec.querySelector(".lv-head h2").textContent:"";
+    var t=d.querySelector(".t"), tier=t?t.className.replace("t ",""):"t1";
+    var q=d.querySelector("summary").textContent.replace(/^(기본|꼬리|압박)/,"").trim();
+    var a=d.querySelector(".ans")?d.querySelector(".ans").innerHTML:"";
+    cards.push({id:(sec?sec.id:"x")+":"+i,lvl:lvl,tier:tier,q:q,a:a});
+  });
+  var state=load("drill"), cur=null;
+  function pool(){ var f=$("#d-filter").value; return cards.filter(function(c){return f==="all"||c.tier===f}) }
+  function pick(){
+    var p=pool(); if(!p.length){ cur=null; return; }
+    var hard=p.filter(function(c){return state[c.id]!=="ok"});
+    var from = hard.length && Math.random()<0.85 ? hard : p;
+    var next; do{ next=from[Math.floor(Math.random()*from.length)] }while(from.length>1 && cur && next.id===cur.id);
+    cur=next;
+  }
+  function render(){
+    var p=pool(), done=p.filter(function(c){return state[c.id]==="ok"}).length;
+    $("#d-count").textContent = done+" / "+p.length+" 자신 있음";
+    $("#d-bar").style.width = p.length? (done/p.length*100)+"%":"0%";
+    if(!cur){ $("#d-q").textContent="이 범위에는 카드가 없습니다."; $("#d-lvl").textContent=""; $("#d-a").hidden=true; return; }
+    var tn={t1:"기본",t2:"꼬리",t3:"압박"}[cur.tier];
+    $("#d-lvl").textContent = cur.lvl+" · "+tn+(state[cur.id]==="ok"?" · 자신 있음 ✓":state[cur.id]==="again"?" · 다시 볼 것":"");
+    $("#d-q").textContent = cur.q;
+    $("#d-a").innerHTML = cur.a; $("#d-a").hidden=true;
+    $("#d-show").disabled=false;
+  }
+  if($("#drill")){
+    $("#d-show").addEventListener("click",function(){ $("#d-a").hidden=false; this.disabled=true });
+    $("#d-ok").addEventListener("click",function(){ if(cur){ state[cur.id]="ok"; save("drill",state); pick(); render(); } });
+    $("#d-again").addEventListener("click",function(){ if(cur){ state[cur.id]="again"; save("drill",state); pick(); render(); } });
+    $("#d-next").addEventListener("click",function(){ pick(); render(); });
+    $("#d-filter").addEventListener("change",function(){ pick(); render(); });
+    $("#d-reset").addEventListener("click",function(){ state={}; save("drill",state); pick(); render(); });
+    pick(); render();
+  }
+})();
+</script>
+
+<!-- ════ 프로젝트 전용 실험 스크립트: 칸마다 /* lvNN 제목 */ 주석으로 구분. window.G 의 헬퍼를 쓴다 ════ -->
+<script>
+(function(){
+  var $=G.$, $$=G.$$, log=G.log, add=G.add, wait=G.wait, reduced=G.reduced;
+  /* lv01 … */
+})();
+</script>

@@ -1,0 +1,63 @@
+{
+  "name": "todo-app",
+  "title": "할 일 앱 코드 읽기",
+  "subtitle": "예시 저장소의 실제 파일 그대로 · 줄을 누르면 해설, 밑줄 단어를 누르면 사전",
+  "repo": "../repo",
+  "artifactUrl": "",
+  "publishFiles": {},
+  "flows": [
+    {
+      "id": "add", "name": "할 일 추가 흐름", "icon": "➕", "section": "기능",
+      "order": [
+        ["화면", "web/src/TodoList.tsx"],
+        ["화면 · 서버 부르기", "web/src/api.ts"],
+        ["서버 입구", "server/src/app.ts"],
+        ["규칙과 저장", "server/src/todoService.ts"],
+        ["규칙과 저장", "server/src/db.ts"]
+      ]
+    },
+    {
+      "id": "docs", "name": "문서 · 설정", "icon": "📄", "section": "프로젝트 바탕",
+      "order": [
+        ["처음 읽는 문서", "README.md"],
+        ["환경변수 (값은 가림)", "web/.env.example"]
+      ]
+    }
+  ],
+  "ui": {
+    "pathShort": [],
+    "fileRoots": [["web/", "웹 화면", "app"], ["server/", "API 서버", "server"], ["", "저장소 맨 위", "build"]],
+    "owners": [
+      { "name": "화면 담당", "label": "web/", "match": ["web/"] },
+      { "name": "서버 담당", "label": "server/", "match": ["server/"] }
+    ],
+    "ownerDefault": "팀",
+    "groupIcons": { "서버(Express)": "🚂" },
+    "arch": {
+      "title": "한 장으로 보는 할 일 앱",
+      "viewBox": "0 0 1000 380",
+      "bands": [{ "x": 12, "y": 12, "w": 976, "h": 356, "label": "내 컴퓨터에서 도는 두 프로그램 + 메모리", "lx": 30, "ly": 352, "cls": "b1" }],
+      "groups": { "front": "웹 화면", "back": "API 서버", "data": "저장", "ext": "사람" },
+      "nodes": [
+        { "id": "user", "x": 30, "y": 140, "w": 150, "h": 76, "ic": "👤", "t": "사용자", "s": "브라우저", "g": "ext", "files": [], "flows": [], "what": "할 일을 입력하고 목록을 보는 사람이에요." },
+        { "id": "web", "x": 250, "y": 120, "w": 200, "h": 116, "ic": "🖥️", "t": "웹 화면", "s": "web/ · React", "sub2": ["TodoList.tsx", "api.ts"], "g": "front", "files": ["web/"], "flows": ["add"], "what": "React 화면이에요. 입력을 받아 api.ts 로 서버에 보내고, 받은 목록을 그려요." },
+        { "id": "server", "x": 520, "y": 120, "w": 200, "h": 116, "ic": "🚂", "t": "API 서버", "s": "server/ · Express", "sub2": ["GET /todos", "POST /todos"], "g": "back", "files": ["server/"], "flows": ["add"], "what": "Express 서버예요. 요청을 검사하고 todoService 로 할 일을 꺼내거나 만들어요." },
+        { "id": "db", "x": 790, "y": 140, "w": 180, "h": 76, "ic": "🧠", "t": "메모리 db", "s": "db.ts", "g": "data", "files": ["server/src/db.ts"], "flows": ["add"], "what": "진짜 DB 대신 서버 메모리에 있는 배열이에요. 서버를 끄면 사라져요." }
+      ],
+      "edges": [
+        { "id": "user_web", "a": "user", "b": "web", "l": "입력 · 클릭" },
+        { "id": "web_srv", "a": "web", "b": "server", "l": "fetch" },
+        { "id": "srv_db", "a": "server", "b": "db", "l": "push · 읽기" }
+      ],
+      "scenarios": [
+        { "id": "add", "ic": "➕", "n": "할 일 추가", "flow": "add", "steps": [
+          { "e": "user_web", "say": "사용자가 '우유 사기'를 쓰고 추가 버튼을 눌러요." },
+          { "e": "web_srv", "say": "api.ts 가 <code>POST /todos</code> 로 {\"title\":\"우유 사기\"} 를 보내요." },
+          { "e": "srv_db", "say": "서버가 검사한 뒤 번호를 붙여 메모리 배열에 넣어요." },
+          { "e": "web_srv", "rev": true, "say": "201 과 새 할 일 JSON 이 돌아와요." },
+          { "n": "web", "say": "화면이 목록 맨 위에 '우유 사기'를 붙여 다시 그려요." }
+        ] }
+      ]
+    }
+  }
+}

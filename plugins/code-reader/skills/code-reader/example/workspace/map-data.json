@@ -1,0 +1,13 @@
+{
+  "summary": "데이터는 서버 메모리의 배열 하나뿐이에요. 파일이나 DB 에 저장하지 않아요.",
+  "dbName": "메모리 저장소 (db.ts)",
+  "firestore": [
+    { "path": "db.todos[]", "what": "할 일 목록 배열이에요. 새 할 일은 끝에 들어가고, 읽을 때 번호가 큰 것부터 정렬해요.", "fields": [
+      { "name": "id", "type": "숫자", "example": "1", "meaning": "db.nextId 에서 받는 번호예요. 1부터 1씩 올라가요.", "writtenBy": [{ "file": "server/src/todoService.ts", "lines": [8, 8] }], "readBy": [{ "file": "web/src/TodoList.tsx", "lines": [32, 32] }] },
+      { "name": "title", "type": "글자", "example": "우유 사기", "meaning": "할 일 제목이에요. 200자까지만 저장해요.", "writtenBy": [{ "file": "server/src/todoService.ts", "lines": [8, 8] }], "readBy": [{ "file": "web/src/TodoList.tsx", "lines": [32, 32] }] },
+      { "name": "done", "type": "참/거짓", "example": "false", "meaning": "끝냈는지예요. 지금은 바꾸는 API 가 없어서 늘 false 예요.", "note": "주의: 끝냄 표시를 바꾸는 코드가 아직 없어요.", "writtenBy": [{ "file": "server/src/todoService.ts", "lines": [8, 8] }], "readBy": [{ "file": "web/src/TodoList.tsx", "lines": [32, 32] }] }
+    ] }
+  ],
+  "local": [],
+  "notes": ["서버를 다시 켜면 db.todos 와 nextId 가 처음으로 돌아가요."]
+}

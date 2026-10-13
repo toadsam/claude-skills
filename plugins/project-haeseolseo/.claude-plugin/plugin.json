@@ -1,0 +1,7 @@
+{
+  "name": "project-haeseolseo",
+  "version": "0.1.0",
+  "description": "내 프로젝트를 기술 면접에서 방어할 수 있게, GitHub 저장소를 기준으로 칸마다 원리 · 재현 실험 · 실제 코드 · 예상 질문(기본 · 꼬리 · 압박)을 담은 해설서를 만들어요.",
+  "license": "MIT",
+  "keywords": ["korean", "interview", "portfolio", "artifact"]
+}

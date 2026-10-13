@@ -1,0 +1,21 @@
+[
+  { "id": "export", "label": "export", "lang": "ts", "patterns": ["\\bexport\\b"] },
+  { "id": "function", "label": "function", "lang": "ts", "patterns": ["\\bfunction\\b"] },
+  { "id": "async-await", "label": "async / await", "lang": "ts", "patterns": ["\\basync\\b", "\\bawait\\b"] },
+  { "id": "promise", "label": "Promise", "lang": "ts", "patterns": ["\\bPromise\\b", "\\.then\\b"] },
+  { "id": "use-state", "label": "useState", "lang": "ts", "patterns": ["\\buseState\\b"] },
+  { "id": "use-effect", "label": "useEffect", "lang": "ts", "patterns": ["\\buseEffect\\b"] },
+  { "id": "fetch", "label": "fetch", "lang": "ts", "patterns": ["\\bfetch\\b"] },
+  { "id": "json-stringify", "label": "JSON.stringify", "lang": "ts", "patterns": ["\\bJSON\\.stringify\\b"] },
+  { "id": "type-alias", "label": "type", "lang": "ts", "patterns": ["\\btype\\s+(?=[A-Z])"] },
+  { "id": "env-var", "label": "환경변수", "lang": "ts", "patterns": ["\\bprocess\\.env\\b", "\\bimport\\.meta\\.env\\b"] },
+  { "id": "nullish", "label": "??", "lang": "ts", "patterns": ["\\?\\?"] },
+  { "id": "optional-chaining", "label": "?.", "lang": "ts", "patterns": ["\\?\\.(?=[a-zA-Z])"] },
+  { "id": "spread", "label": "... (펼치기)", "lang": "ts", "patterns": ["\\.\\.\\.(?=[a-zA-Z\\[])"] },
+  { "id": "template-literal", "label": "`${}`", "lang": "ts", "patterns": ["\\$\\{"] },
+  { "id": "express", "label": "express", "lang": "ts", "patterns": ["\\bexpress\\b"] },
+  { "id": "middleware", "label": "app.use", "lang": "ts", "patterns": ["\\bapp\\.use\\b"] },
+  { "id": "cors", "label": "cors", "lang": "ts", "patterns": ["\\bcors\\b"] },
+  { "id": "http-method", "label": "GET / POST", "lang": "ts", "patterns": ["\\bapp\\.(get|post)\\b", "\"POST\""] },
+  { "id": "http-status", "label": "상태 코드", "lang": "ts", "patterns": ["\\bstatus\\((?=\\d)"] }
+]
