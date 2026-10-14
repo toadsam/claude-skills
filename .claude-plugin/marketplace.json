@@ -1,28 +1,57 @@
 {
   "name": "study-my-code",
   "description": "내 프로젝트를 AI 없이 이해하기 위한 Claude Code 스킬 모음 (한국어)",
-  "owner": { "name": "toadsam" },
+  "owner": {
+    "name": "toadsam"
+  },
   "plugins": [
     {
       "name": "code-reader",
       "source": "./plugins/code-reader",
       "description": "저장소 코드에 줄마다 한국어 해설을 붙인 인터랙티브 페이지를 만들고, 코드가 바뀌면 바뀐 덩어리만 다시 써요.",
       "category": "learning",
-      "tags": ["korean", "code-reading", "learning", "artifact"]
+      "tags": [
+        "korean",
+        "code-reading",
+        "learning",
+        "artifact"
+      ]
     },
     {
       "name": "project-haeseolseo",
       "source": "./plugins/project-haeseolseo",
       "description": "내 프로젝트를 기술 면접에서 끝까지 방어할 수 있게, 저장소 기준 면접 대비 해설서를 만들어요.",
       "category": "learning",
-      "tags": ["korean", "interview", "portfolio", "artifact"]
+      "tags": [
+        "korean",
+        "interview",
+        "portfolio",
+        "artifact"
+      ]
     },
     {
       "name": "codebase-anatomy",
       "source": "./plugins/codebase-anatomy",
       "description": "실제 소스에서 뽑은 구조 · 요청 추적 · 보안 기초 · 결함 목록으로 코드베이스 해부도를 만들어요.",
       "category": "learning",
-      "tags": ["architecture", "onboarding", "audit", "artifact"]
+      "tags": [
+        "architecture",
+        "onboarding",
+        "audit",
+        "artifact"
+      ]
+    },
+    {
+      "name": "code-movie",
+      "source": "./plugins/code-movie",
+      "description": "코드를 아직 못 읽는 사람을 위해, 버튼 하나를 눌렀을 때 값이 앱 · 서버 · DB 를 오가는 길을 애니메이션 영화로 보여 줘요.",
+      "category": "learning",
+      "tags": [
+        "korean",
+        "animation",
+        "learning",
+        "artifact"
+      ]
     }
   ]
 }

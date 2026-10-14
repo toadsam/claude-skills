@@ -1,0 +1,598 @@
+<title>{{TITLE}}</title>
+<meta name="description" content="{{SUBTITLE}}">
+<style>
+:root{
+  --bg:#f4f5f8; --panel:#ffffff; --ink:#1b2030; --ink2:#4a5164; --ink3:#7d8496; --line:#dfe2ea;
+  --stage:#eef1f7; --stage-line:#cfd5e2; --node:#ffffff; --node-ink:#1b2030;
+  --app:#3b6fe0; --app-soft:#e4ecfd; --server:#7a4fd6; --server-soft:#efe8fc; --db:#d98a12; --db-soft:#fcf0dc;
+  --ext:#16907a; --ext-soft:#dcf3ee; --room:#faf8ff; --ai:#d1437f; --ai-soft:#fde6f0; --tool:#5f6b7f; --tool-soft:#e9ecf1;
+  --card:#fffef8; --card-line:#e7d9a8; --chip:#fff4c9; --chip-ink:#4a3a00; --hot:#e0475b; --ok:#1f9d55; --bad:#c2410c;
+  --sub-bg:#1b2030; --sub-ink:#ffffff; --accent:#3b6fe0; --accent-ink:#ffffff; --shadow:0 6px 20px rgba(27,32,48,.10);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#12141b; --panel:#1a1d27; --ink:#e8eaf2; --ink2:#b4b9c8; --ink3:#868c9e; --line:#2c3040;
+  --stage:#171a23; --stage-line:#343a4d; --node:#20242f; --node-ink:#e8eaf2;
+  --app:#6d97f5; --app-soft:#1d2a47; --server:#a585f0; --server-soft:#2a2142; --db:#f0a83a; --db-soft:#3a2c14;
+  --ext:#3cc4a8; --ext-soft:#153a33; --room:#232031; --ai:#f075a8; --ai-soft:#3d1a2a; --tool:#9aa5b8; --tool-soft:#262b35;
+  --card:#2a2a22; --card-line:#5c5333; --chip:#4a4122; --chip-ink:#fff2c4; --hot:#ff6b7d; --ok:#4ade80; --bad:#fb923c;
+  --sub-bg:#0b0c11; --sub-ink:#f4f5f8; --accent:#6d97f5; --accent-ink:#0b0c11; --shadow:0 6px 20px rgba(0,0,0,.35); color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#12141b; --panel:#1a1d27; --ink:#e8eaf2; --ink2:#b4b9c8; --ink3:#868c9e; --line:#2c3040;
+  --stage:#171a23; --stage-line:#343a4d; --node:#20242f; --node-ink:#e8eaf2;
+  --app:#6d97f5; --app-soft:#1d2a47; --server:#a585f0; --server-soft:#2a2142; --db:#f0a83a; --db-soft:#3a2c14;
+  --ext:#3cc4a8; --ext-soft:#153a33; --room:#232031; --ai:#f075a8; --ai-soft:#3d1a2a; --tool:#9aa5b8; --tool-soft:#262b35;
+  --card:#2a2a22; --card-line:#5c5333; --chip:#4a4122; --chip-ink:#fff2c4; --hot:#ff6b7d; --ok:#4ade80; --bad:#fb923c;
+  --sub-bg:#0b0c11; --sub-ink:#f4f5f8; --accent:#6d97f5; --accent-ink:#0b0c11; --shadow:0 6px 20px rgba(0,0,0,.35); color-scheme:dark }
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 "Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:1560px;margin:0 auto;padding:16px 20px 28px}
+header.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+header.top h1{font-size:20px;margin:0;letter-spacing:-.01em}
+header.top .story{color:var(--ink2);font-size:14px}
+header.top .sp{flex:1}
+.tgl{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink2);user-select:none}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px;align-items:start}
+@media (max-width:1100px){.grid{grid-template-columns:minmax(0,1fr)}}
+/* ── 무대 */
+.theater{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;box-shadow:var(--shadow);min-width:0}
+.viewport{position:relative;width:100%;aspect-ratio:1200/660;overflow:hidden;border-radius:10px;background:var(--stage)}
+#stage{position:absolute;left:0;top:0;width:1200px;height:660px;transform-origin:0 0}
+#stage.instant *, #stage.instant{transition:none!important}
+#links{position:absolute;inset:0;pointer-events:none}
+#links path{fill:none;stroke:var(--stage-line);stroke-width:3;stroke-dasharray:2 9;stroke-linecap:round}
+#links path.hot{stroke:var(--accent);stroke-dasharray:10 8;stroke-width:4;animation:dash 0.9s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-36}}
+.node{position:absolute;border-radius:16px;background:var(--node);border:2px solid var(--stage-line);color:var(--node-ink);
+  transition:left .7s ease,top .7s ease,width .7s ease,height .7s ease,box-shadow .3s,border-color .3s,opacity .4s;padding:10px 14px}
+.node .hd{display:flex;align-items:center;gap:8px;font-weight:700;font-size:17px}
+.node .hd .ic{font-size:24px}
+.node .sub{font-size:12px;color:var(--ink3);margin-top:1px}
+.node.app{background:var(--app-soft);border-color:var(--app)}
+.node.server{background:var(--server-soft);border-color:var(--server)}
+.node.db{background:var(--db-soft);border-color:var(--db)}
+.node.ext{background:var(--ext-soft);border-color:var(--ext)}
+.node.ai{background:var(--ai-soft);border-color:var(--ai)}
+.node.tool{background:var(--tool-soft);border-color:var(--tool)}
+#stage.zoom .room{opacity:1}
+.node.on{box-shadow:0 0 0 5px color-mix(in srgb,var(--accent) 30%,transparent),var(--shadow)}
+.node.dim{opacity:.45}
+.node .busy{position:absolute;right:12px;top:12px;font-size:12px;color:var(--ink2);display:none;align-items:center;gap:6px}
+.node.wait .busy{display:flex}
+.spin{width:14px;height:14px;border:2px solid var(--ink3);border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.room{position:absolute;border-radius:12px;background:var(--room);border:1.5px dashed var(--rc,var(--server));padding:8px 10px;opacity:0;
+  transition:left .7s ease,top .7s ease,width .7s ease,height .7s ease,opacity .5s,box-shadow .3s;pointer-events:none}
+#stage.zoom .room{opacity:1}
+.room .rn{font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px}
+.room .num{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--rc,var(--server));color:var(--sub-ink);font-size:12px}
+.room .rs{font-size:11px;color:var(--ink3);font-family:ui-monospace,Consolas,monospace}
+.room.on{border-style:solid;box-shadow:0 0 0 4px color-mix(in srgb,var(--rc,var(--server)) 30%,transparent)}
+/* 앱 화면 */
+.screen{position:absolute;left:14px;right:14px;bottom:14px;top:62px;background:var(--panel);border-radius:12px;border:1px solid var(--line);
+  padding:10px;display:flex;flex-direction:column;gap:8px;overflow:hidden}
+.screen .inp{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:14px;min-height:40px;background:var(--bg)}
+.screen .inp .caret{display:inline-block;width:2px;height:16px;background:var(--ink);vertical-align:-3px;animation:blink 1s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+.screen .btn{align-self:flex-start;background:var(--app);color:#fff;border-radius:8px;padding:6px 14px;font-weight:700;font-size:14px;transition:transform .15s}
+.screen .btn.press{transform:scale(.88)}
+.screen .player{flex:1;display:none;position:relative;border-radius:10px;overflow:hidden;background:#0f1320}
+.screen.playing .player{display:block}
+.screen.playing > :not(.player){display:none}
+.screen .stitle{font-weight:800;font-size:15px}
+.screen .sitem{border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:13.5px;background:var(--bg);transition:transform .15s}
+.screen .sitem.sel{background:var(--app);color:#fff;border-color:var(--app)}
+.screen .sitem.press{transform:scale(.94)}
+.slot{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:4px}
+.slot .hand{font-size:46px}
+.slot .w{font-size:20px;font-weight:800}
+.slot .tag{position:absolute;left:8px;top:6px;font-size:11px;opacity:.75}
+.slot .bar{position:absolute;left:0;bottom:0;height:5px;background:#ffd34d;width:0}
+.slot.a{background:linear-gradient(160deg,#25335c,#1a2140)}
+.slot.b{background:linear-gradient(160deg,#3b2a5c,#21183a)}
+.plabel{position:absolute;left:0;right:0;bottom:-30px;text-align:center;font-size:12px;color:var(--ink2)}
+/* 카드 · 칩 */
+.card{position:absolute;transform:translate(-50%,-50%);background:var(--card);border:2px solid var(--card-line);border-radius:12px;
+  padding:7px 10px;box-shadow:var(--shadow);font-weight:700;font-size:15px;white-space:nowrap;z-index:5;display:flex;flex-direction:column;align-items:center;gap:4px;
+  transition:opacity .4s,filter .4s}
+.card .ttag{font-size:11px;font-weight:700;color:var(--ink2);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:0 8px;margin-top:-20px}
+.card .row{display:flex;gap:5px;align-items:center}
+.card .badge{font-size:12px;font-weight:700;border-radius:999px;padding:1px 9px;background:var(--ink);color:var(--bg)}
+.card.dim{opacity:.35;filter:grayscale(1)}
+.card.win{border-color:var(--ok);box-shadow:0 0 0 5px color-mix(in srgb,var(--ok) 30%,transparent),var(--shadow)}
+.card .crown{position:absolute;top:-30px;right:-10px;font-size:22px}
+.card.small{font-size:12px;padding:3px 8px}
+.chip{background:var(--chip);color:var(--chip-ink);border-radius:8px;padding:2px 9px;display:inline-flex;flex-direction:column;align-items:center;line-height:1.3;position:relative}
+.chip small{font-size:10px;font-weight:600;opacity:.75}
+.chip.hot{background:var(--hot);color:#fff}
+.chip .mk{position:absolute;top:-12px;right:-8px;font-size:13px}
+/* 문서 · 배열 · 사람 카드 */
+.fields{display:grid;grid-template-columns:auto auto;gap:1px 10px;font:12.5px/1.5 ui-monospace,Consolas,monospace;text-align:left}
+.fields .fk{color:var(--ink3);font-weight:600}
+.fields .fv{color:var(--ink);font-weight:700}
+.fields .hot{color:var(--hot)}
+.gridv{display:grid;gap:1px;padding:2px}
+.gridv i{width:6px;height:6px;border-radius:1.5px;background:color-mix(in srgb,var(--accent) 55%,var(--card))}
+.gridv i.h{background:var(--hot)}
+.gridv i.f{background:var(--ok)}
+.gridv i.l{background:#ffd34d;box-shadow:0 0 0 1px var(--ink)}
+.glabel{font:700 12px ui-monospace,Consolas,monospace;color:var(--ink2)}
+.pose svg{display:block}
+.pose .bone{stroke:var(--accent);stroke-width:2;stroke-linecap:round}
+.pose .pt{fill:var(--ink)}
+.pose .hand .bone{stroke:var(--ai);stroke-width:1.2}
+.pose .hand .pt{fill:var(--ai)}
+.pose .face .pt{fill:var(--ink3)}
+.card.ghost .pose{opacity:.55}
+.card.ghost .pose .bone{stroke-dasharray:3 2}
+/* 극장 첫 화면 */
+#home{padding-block:6px 20px}
+#home .hero{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+#home .hero h1{font-size:28px;margin:0;letter-spacing:-.02em}
+#home .hero p{margin:0;color:var(--ink2);max-width:70ch}
+#home h2{font-size:13px;letter-spacing:.06em;color:var(--ink3);margin:22px 0 10px;text-transform:uppercase}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.mcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;text-align:left;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow);transition:transform .15s,border-color .15s;min-width:0}
+.mcard:hover{transform:translateY(-2px);border-color:var(--accent)}
+.mcard .mi{font-size:30px;line-height:1}
+.mcard .mt{font-weight:800;font-size:17px}
+.mcard .ms{color:var(--ink2);font-size:14px;flex:1}
+.mcard .mm{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink3);font-variant-numeric:tabular-nums}
+.mcard .bar{height:5px;border-radius:3px;background:var(--line);overflow:hidden}
+.mcard .bar i{display:block;height:100%;background:var(--ok)}
+.label{position:absolute;transform:translate(-50%,-100%);font:600 12px ui-monospace,Consolas,monospace;background:var(--ink);color:var(--bg);
+  border-radius:6px;padding:2px 8px;white-space:nowrap;z-index:6;pointer-events:none}
+.note{position:absolute;transform:translate(-50%,0);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 12px;font-size:13px;
+  box-shadow:var(--shadow);z-index:7;max-width:420px;white-space:normal;text-align:center}
+/* 자막 · 조작 */
+.subtitle{margin-top:10px;background:var(--sub-bg);color:var(--sub-ink);border-radius:10px;padding:12px 16px;font-size:16.5px;min-height:56px;line-height:1.55}
+.subtitle b{color:#ffd34d}
+.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px}
+.cbtn{border:1px solid var(--line);background:var(--panel);border-radius:9px;padding:6px 12px;font-size:14px}
+.cbtn.main{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700;min-width:96px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.seg button{border:0;background:var(--panel);padding:6px 10px;font-size:13px}
+.seg button.on{background:var(--ink);color:var(--bg)}
+.controls .pos{font-variant-numeric:tabular-nums;color:var(--ink2);font-size:13px;margin-left:auto}
+.timeline{display:flex;gap:6px;margin-top:10px;overflow-x:auto;padding-bottom:4px}
+.tl{flex:0 0 auto;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:6px 10px;font-size:12.5px;text-align:left;max-width:170px;position:relative;overflow:hidden}
+.tl .n{font-weight:800;color:var(--ink3);margin-right:4px}
+.tl.seen{background:color-mix(in srgb,var(--ok) 10%,var(--panel))}
+.tl.cur{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.tl .pg{position:absolute;left:0;bottom:0;height:3px;background:var(--accent);width:0}
+/* 오른쪽 패널 */
+.side{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:14px;min-width:0}
+.side .k{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--ink3);text-transform:uppercase}
+.side h2{font-size:19px;margin:2px 0 0;text-wrap:balance}
+.side .exp{color:var(--ink2);font-size:14.5px}
+.carry{background:var(--card);border:1.5px solid var(--card-line);border-radius:10px;padding:8px 12px;font-weight:700;font-size:14px}
+.terms{display:flex;flex-wrap:wrap;gap:6px}
+.term{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:2px 10px;font-size:13px}
+.term.open{background:var(--ink);color:var(--bg)}
+.tdef{font-size:13.5px;color:var(--ink2);background:var(--bg);border-radius:8px;padding:8px 10px}
+details.code{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+details.code summary{padding:9px 12px;cursor:pointer;font-weight:700;font-size:14px;background:var(--bg)}
+.ref{border-top:1px solid var(--line)}
+.ref .fh{font:12px ui-monospace,Consolas,monospace;color:var(--ink2);padding:6px 12px 2px;word-break:break-all}
+.ref .why{font-size:13px;padding:0 12px 6px;color:var(--ink)}
+.ref pre{margin:0;padding:8px 0;overflow-x:auto;font:12.5px/1.55 ui-monospace,Consolas,monospace;background:var(--bg)}
+.ref pre .ln{display:inline-block;width:42px;text-align:right;padding-right:10px;color:var(--ink3);user-select:none}
+.next{font-size:13px;color:var(--ink3)}
+/* 끝 화면 */
+.endcard{position:absolute;inset:0;background:color-mix(in srgb,var(--stage) 92%,transparent);display:none;align-items:center;justify-content:center;z-index:20}
+.endcard.show{display:flex}
+.endcard .in{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 26px;max-width:760px;box-shadow:var(--shadow)}
+.endcard h3{margin:0 0 10px;font-size:22px}
+.endcard ol{margin:0;padding-left:22px;font-size:15px;line-height:1.75}
+.endcard .acts{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.endcard a{color:var(--accent)}
+kbd{font:12px ui-monospace,Consolas,monospace;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 5px;background:var(--bg)}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <button class="cbtn" id="bHome" hidden>🎬 극장으로</button><h1 id="ttl"></h1><span class="story" id="story"></span><span class="sp"></span>
+    <label class="tgl" id="autoWrap"><input type="checkbox" id="auto" checked> 다음 장면 자동으로 이어 보기</label>
+  </header>
+  <section id="home" hidden></section>
+  <div class="grid" id="player">
+    <section class="theater">
+      <div class="viewport" id="vp">
+        <div id="stage"><svg id="links" viewBox="0 0 1200 660"></svg></div>
+        <div class="endcard" id="end"><div class="in" id="endin"></div></div>
+      </div>
+      <div class="subtitle" id="subt"></div>
+      <div class="controls">
+        <button class="cbtn" id="bPrev" title="이전 장면 (←)">⏮ 이전</button>
+        <button class="cbtn main" id="bPlay" title="재생 / 멈춤 (Space)">▶ 재생</button>
+        <button class="cbtn" id="bRe" title="이 장면 다시 (R)">↺ 이 장면 다시</button>
+        <button class="cbtn" id="bNext" title="다음 장면 (→)">다음 ⏭</button>
+        <span class="seg" id="speed"><button data-r="0.5">0.5×</button><button data-r="1" class="on">1×</button><button data-r="1.5">1.5×</button><button data-r="2">2×</button></span>
+        <span class="pos" id="pos"></span>
+      </div>
+      <div class="timeline" id="tline"></div>
+    </section>
+    <aside class="side" id="side"></aside>
+  </div>
+</div>
+
+<script id="movie-data" type="application/json">/*__MOVIE__*/</script>
+<script>
+"use strict";
+const DATA = JSON.parse(document.getElementById("movie-data").textContent);
+const MOVIES = DATA.movies; const THEATER = DATA.theater;
+let M = MOVIES[0];
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const rich = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/`(.+?)`/g, "<code>$1</code>");
+let KEY = "codemovie." + (M.key || "movie");
+const ls = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+const store = { get: (k, d) => ls.get(KEY + "." + k, d), set: (k, v) => ls.set(KEY + "." + k, v) };   // 영화마다
+const gstore = { get: (k, d) => ls.get("codemovie._." + k, d), set: (k, v) => ls.set("codemovie._." + k, v) }; // 극장 전체
+
+const stage = $("#stage"), vp = $("#vp");
+const ST = { scene: 0, playing: false, rate: 1, tok: 0, seen: new Set(store.get("seen", [])) };
+const ABORT = { abort: true };
+
+/* ── 무대 크기 맞추기 */
+function fit() { const s = vp.clientWidth / 1200; stage.style.transform = "scale(" + s + ")"; }
+new ResizeObserver(fit).observe(vp);
+
+/* ── 배치: 보통 / 확대 */
+const NODES = {}; const ROOMS = {};
+function geo(id) { // 지금 배치에서 상자(또는 방)의 사각형
+  if (id.startsWith("room:")) { const r = ROOMS[id.slice(5)]; return r.cur; }
+  return NODES[id].cur;
+}
+function center(id, dx = 0, dy = 0) { const g = geo(id); const head = id.startsWith("room:") ? 34 : (g.h > 140 ? 48 : 0); // 제목 아래 빈 곳의 가운데
+  return { x: g.x + g.w / 2 + dx, y: g.y + head + (g.h - head) / 2 + dy }; }
+function place(el, g) { el.style.left = g.x + "px"; el.style.top = g.y + "px"; el.style.width = g.w + "px"; el.style.height = g.h + "px"; }
+function layout(zoom) {
+  stage.classList.toggle("zoom", !!zoom);
+  for (const n of M.stage.nodes) { n.cur = (zoom && n.zoom) ? n.zoom : n; place(NODES[n.id].el, n.cur); NODES[n.id].cur = n.cur; }
+  const host = M.stage.nodes.find((n) => n.id === M.stage.roomsIn);
+  if (host) {
+    const g = zoom ? host.zoom : host; const rs = M.stage.rooms; const cols = Math.ceil(rs.length / 2);
+    const padX = 16, top = 72, gap = 12; const w = (g.w - padX * 2 - gap * (cols - 1)) / cols; const h = (g.h - top - 16 - gap) / 2;
+    rs.forEach((r, i) => { const c = i % cols, row = Math.floor(i / cols);
+      const rg = zoom ? { x: g.x + padX + c * (w + gap), y: g.y + top + row * (h + gap), w, h } : { x: g.x + g.w / 2 - 10, y: g.y + g.h / 2, w: 20, h: 20 };
+      ROOMS[r.id].cur = rg; place(ROOMS[r.id].el, rg); });
+  }
+  drawLinks();
+}
+function drawLinks(hot) {
+  const svg = $("#links"); svg.innerHTML = "";
+  for (const [a, b] of M.stage.links) { const p = center(a), q = center(b);
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    const mx = (p.x + q.x) / 2, my = Math.min(p.y, q.y) - 40 * (Math.abs(p.y - q.y) < 40 ? 1 : 0);
+    path.setAttribute("d", `M${p.x},${p.y} Q${mx},${my} ${q.x},${q.y}`);
+    if (hot && ((hot[0] === a && hot[1] === b) || (hot[0] === b && hot[1] === a))) path.classList.add("hot");
+    svg.appendChild(path); }
+}
+function buildStage() {
+  stage.querySelectorAll(".node,.room,.card,.label,.note").forEach((e) => e.remove());
+  for (const n of M.stage.nodes) {
+    const el = document.createElement("div"); el.className = "node " + n.kind; el.dataset.id = n.id;
+    el.innerHTML = `<div class="hd"><span class="ic">${esc(n.icon)}</span>${esc(n.name)}</div><div class="sub">${esc(n.sub || "")}</div><div class="busy"><span class="spin"></span><span class="bt">기다리는 중</span></div>` +
+      (n.kind === "app" ? `<div class="screen">${n.button === "" ? "" : `<div class="inp"></div><div class="btn">${esc(n.button || "보내기")}</div>`}<div class="player"></div></div>` : "");
+    stage.appendChild(el); NODES[n.id] = { el, cur: n };
+  }
+  for (const r of M.stage.rooms || []) {
+    const el = document.createElement("div"); el.className = "room"; { const h = M.stage.nodes.find((n) => n.id === M.stage.roomsIn); if (h) el.style.setProperty("--rc", `var(--${h.kind})`); } el.innerHTML = `<div class="rn">${r.n != null ? `<span class="num">${esc(r.n)}</span>` : ""}${esc(r.name)}</div><div class="rs">${esc(r.sub || "")}</div>`;
+    stage.appendChild(el); ROOMS[r.id] = { el, cur: null };
+  }
+  CARDS.clear(); layout(false); setFocus(null);
+}
+
+/* ── 시간: 멈춤 · 속도가 모든 움직임에 걸리게 Web Animations 로만 */
+let INSTANT = false;
+const live = new Set();
+function track(a) { a.playbackRate = ST.rate; if (!ST.playing) a.pause(); live.add(a); a.finished.catch(() => {}).finally(() => live.delete(a)); return a; }
+function anim(el, kf, ms, ease = "ease-in-out") {
+  if (INSTANT) { const last = kf[kf.length - 1]; for (const k in last) if (k !== "offset" && k !== "easing") el.style[k] = last[k]; return Promise.resolve(); }
+  const a = track(el.animate(kf, { duration: ms, easing: ease, fill: "forwards" }));
+  const tk = ST.tok;
+  return a.finished.then(() => { if (tk !== ST.tok) throw ABORT; const last = kf[kf.length - 1]; for (const k in last) if (k !== "offset" && k !== "easing") el.style[k] = last[k]; a.cancel(); }, () => { throw ABORT; });
+}
+const clock = document.createElement("i"); clock.hidden = true; document.body.appendChild(clock);
+function sleep(ms) { if (INSTANT) return Promise.resolve(); return anim(clock, [{ opacity: 0 }, { opacity: 1 }], ms, "linear"); }
+function cssWait(ms) { return sleep(ms); } // CSS 전환(확대 등)을 기다릴 때
+function setPlaying(p) { ST.playing = p; for (const a of [...live, ...document.getAnimations()]) { try { p ? a.play() : a.pause(); } catch (e) {} }
+  stage.style.setProperty("--ps", p ? "running" : "paused"); $("#bPlay").textContent = p ? "⏸ 멈춤" : "▶ 재생"; }
+function setRate(r) { ST.rate = r; for (const a of live) a.playbackRate = r; for (const a of document.getAnimations()) { try { a.playbackRate = r; } catch (e) {} }
+  document.querySelectorAll("#speed button").forEach((b) => b.classList.toggle("on", +b.dataset.r === r)); gstore.set("rate", r); }
+
+/* ── 카드 */
+const CARDS = new Map();
+function chipHTML(c) { const [t, s] = String(c).split("/"); return `<span class="chip"><span>${esc(t)}</span>${s ? `<small>${esc(s)}</small>` : ""}</span>`; }
+function renderCard(cd) {
+  const el = cd.el;
+  el.innerHTML = (cd.tag ? `<span class="ttag">${esc(cd.tag)}</span>` : "") +
+    (cd.chips ? `<div class="row">${cd.chips.map(chipHTML).join("")}</div>` : cd.fields ? fieldsHTML(cd) : cd.grid ? gridHTML(cd) : cd.pose ? poseHTML(cd) : `<div>${esc(cd.text)}</div>`) +
+    (cd.badge ? `<span class="badge">${esc(cd.badge)}</span>` : "") + (cd.win ? `<span class="crown">👑</span>` : "");
+  el.classList.toggle("ghost", !!cd.ghost); el.classList.toggle("small", !!cd.small); el.classList.toggle("win", !!cd.win); el.classList.toggle("dim", !!cd.dim);
+}
+function fieldsHTML(cd) { const mk = new Set(cd.fmark || []);
+  return '<div class="fields">' + cd.fields.map((f, i) => `<span class="fk${mk.has(i) ? " hot" : ""}">${esc(f[0])}</span><span class="fv${mk.has(i) ? " hot" : ""}">${esc(String(f[1]).length > 36 ? String(f[1]).slice(0, 35) + "…" : f[1])}</span>`).join("") + "</div>"; }
+function gridDims(g) { return { r: Math.max(1, Math.min(10, g.rows)), c: Math.max(1, Math.min(20, g.cols)) }; }
+function holeSet(g) { const { r, c } = gridDims(g); const n = r * c, k = Math.round(n * (g.holes || 0)); const s = new Set(); let x = 7;
+  while (s.size < k) { x = (x * 1103515245 + 12345) % 2147483648; s.add(x % n); } return s; }
+function gridHTML(cd) { const g = cd.grid; const { r, c } = gridDims(g); const holes = holeSet(g); const hl = new Set(g.hl || []); const filled = new Set(cd.filled || []);
+  let cells = ""; for (let i = 0; i < r * c; i++) cells += `<i class="${holes.has(i) ? "h" : filled.has(i) ? "f" : hl.has(i) ? "l" : ""}"></i>`;
+  return `<div class="gridv" style="grid-template-columns:repeat(${c},6px)">${cells}</div><div class="glabel">${esc(g.label || g.rows + " × " + g.cols)}</div>`; }
+/* 사람 모양: 상체 13 · 양손 21+21 · 얼굴 70 = 125점 (설명용 그림, 실제 좌표 아님) */
+const POSE = (() => {
+  const body = [[60,34],[60,56],[40,61],[80,61],[30,86],[90,86],[36,108],[84,108],[47,124],[73,124],[60,124],[55,29],[65,29]];
+  const bones = [[1,2],[1,3],[2,4],[4,6],[3,5],[5,7],[1,10],[10,8],[10,9],[0,1]];
+  const hand = (wx, wy, dir) => { const p = [[wx, wy]]; for (let f = 0; f < 5; f++) { const ang = (-150 + f * 30) * Math.PI / 180; for (let j = 1; j <= 4; j++) p.push([wx + Math.cos(ang) * 3.2 * j * dir, wy + Math.sin(ang) * 3.2 * j]); } return p; };
+  const face = []; const ring = (cx, cy, rx, ry, n, a0 = 0, a1 = 360) => { for (let i = 0; i < n; i++) { const a = (a0 + (a1 - a0) * i / Math.max(1, n - (a1 - a0 === 360 ? 0 : 1))) * Math.PI / 180; face.push([cx + rx * Math.cos(a), cy + ry * Math.sin(a)]); } };
+  ring(60, 30, 13, 15, 17, 0, 180); ring(54, 22, 4, 1.5, 5, 180, 360); ring(66, 22, 4, 1.5, 5, 180, 360); ring(60, 30, 1.2, 4, 9, 0, 360);
+  ring(54.5, 26, 2.6, 1.2, 6); ring(65.5, 26, 2.6, 1.2, 6); ring(60, 37, 5, 2, 20); face.push([54.5, 26], [65.5, 26]);
+  return { body, bones, face, lh: hand(36, 108, 1), rh: hand(84, 108, -1) };
+})();
+function poseHTML(cd) { const p = cd.pose; const nz = p.noise || 0, fv = p.finger || 0, o = p.off || { x: 0, y: 0, r: 0, s: 1 };
+  const j = (i, k) => nz ? (Math.sin(i * 12.9898 + k * 78.233) * 43758.5453 % 1) * 3 * nz : 0;
+  const B = POSE.body.map(([x, y], i) => [x + j(i, 1), y + j(i, 2)]);
+  const hand = (pts, cls, wi) => { const w = B[wi]; const bx = POSE.body[wi]; let s = "", d = "";
+    const P = pts.map(([x, y], i) => { const f = i ? 1 + fv * (Math.sin(i * 3.7 + wi) * .55) : 1; return [w[0] + (x - bx[0]) * f + j(i + wi * 30, 3), w[1] + (y - bx[1]) * f + j(i + wi * 30, 4)]; });
+    for (let f = 0; f < 5; f++) { let prev = P[0]; for (let k = 1; k <= 4; k++) { const q = P[f * 4 + k]; d += `<line class="bone" x1="${prev[0].toFixed(1)}" y1="${prev[1].toFixed(1)}" x2="${q[0].toFixed(1)}" y2="${q[1].toFixed(1)}"/>`; prev = q; } }
+    for (const q of P) s += `<circle class="pt" cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="1"/>`; return `<g class="hand ${cls}">${d}${s}</g>`; };
+  const bones = POSE.bones.map(([a, b]) => `<line class="bone" x1="${B[a][0]}" y1="${B[a][1]}" x2="${B[b][0]}" y2="${B[b][1]}"/>`).join("");
+  const pts = B.map(([x, y]) => `<circle class="pt" cx="${x}" cy="${y}" r="2.2"/>`).join("");
+  const face = POSE.face.map(([x, y], i) => `<circle class="pt" cx="${(x + j(i + 90, 5) * .4).toFixed(1)}" cy="${(y + j(i + 90, 6) * .4).toFixed(1)}" r=".75"/>`).join("");
+  return `<div class="pose"><svg width="190" height="202" viewBox="0 12 120 128"><g transform="translate(${o.x} ${o.y}) rotate(${o.r} 60 70) translate(60 70) scale(${o.s}) translate(-60 -70)"><g class="bodyg">${bones}${pts}</g><g class="face">${face}</g>${hand(POSE.lh, "lh", 6)}${hand(POSE.rh, "rh", 7)}</g></svg></div>${p.label ? `<div class="glabel">${esc(p.label)}</div>` : ""}`; }
+async function tween(ms, f) { if (INSTANT) { f(1); return; } const n = Math.max(2, Math.round(ms / 60)); for (let i = 1; i <= n; i++) { await sleep(ms / n); f(i / n); } }
+function at(cd, p) { cd.el.style.left = p.x + "px"; cd.el.style.top = p.y + "px"; cd.x = p.x; cd.y = p.y; }
+function card(id) { const c = CARDS.get(id); if (!c) throw new Error("없는 카드: " + id); return c; }
+
+/* ── 동작들 */
+function setFocus(id) {
+  document.querySelectorAll(".node.on,.room.on").forEach((e) => e.classList.remove("on"));
+  if (!id) return; (id.startsWith("room:") ? ROOMS[id.slice(5)].el : NODES[id].el).classList.add("on");
+}
+function say(t) { if (t) $("#subt").innerHTML = rich(t); }
+function flipChips(cd, update) {
+  const row = cd.el.querySelector(".row"); const before = row ? [...row.children].map((c) => c.getBoundingClientRect()) : [];
+  const oldChips = cd.chips || []; update(); renderCard(cd);
+  const row2 = cd.el.querySelector(".row"); if (!row2 || INSTANT) return Promise.resolve();
+  const s = vp.clientWidth / 1200; const jobs = [];
+  [...row2.children].forEach((el, i) => {
+    const j = cd._from ? cd._from[i] : i; const b = before[j]; if (!b) return;
+    const a = el.getBoundingClientRect(); const dx = (b.left - a.left) / s, dy = (b.top - a.top) / s;
+    if (dx || dy) jobs.push(anim(el, [{ transform: `translate(${dx}px,${dy}px)` }, { transform: "translate(0,0)" }], 900));
+  });
+  return Promise.all(jobs);
+}
+const A = {
+  async focus(a) { setFocus(a.node); },
+  async zoom(a) { stage.classList.toggle("instant", INSTANT); layout(true); if (!INSTANT) await cssWait(800); stage.classList.remove("instant"); },
+  async unzoom(a) { stage.classList.toggle("instant", INSTANT); layout(false); for (const c of CARDS.values()) if (c.where && c.where.startsWith("room:")) { c.where = M.stage.roomsIn; at(c, center(c.where, c.dx || 0, c.dy || 0)); } if (!INSTANT) await cssWait(800); stage.classList.remove("instant"); },
+  async type(a) { const scr = NODES[a.node].el.querySelector(".screen"); scr.classList.remove("playing"); let inp = scr.querySelector(".inp"); if (!inp) { inp = document.createElement("div"); inp.className = "inp"; scr.insertBefore(inp, scr.querySelector(".btn,.player")); }
+    if (INSTANT) { inp.textContent = a.text; return; }
+    for (let i = 1; i <= a.text.length; i++) { inp.innerHTML = esc(a.text.slice(0, i)) + '<span class="caret"></span>'; await sleep(70); } inp.textContent = a.text; },
+  async press(a) { const scr = NODES[a.node].el.querySelector(".screen");
+    const b = a.label ? [...scr.querySelectorAll(".btn,.sitem")].find((e) => e.textContent.trim() === a.label) || [...scr.querySelectorAll(".btn,.sitem")].find((e) => e.textContent.includes(a.label)) : scr.querySelector(".btn");
+    if (!b) return; if (b.classList.contains("sitem")) { scr.querySelectorAll(".sitem.sel").forEach((e) => e.classList.remove("sel")); b.classList.add("sel"); }
+    if (INSTANT) return; b.classList.add("press"); await sleep(220); b.classList.remove("press"); },
+  async show(a) { const el = document.createElement("div"); el.className = "card"; stage.appendChild(el);
+    const cd = { id: a.card, el, text: a.text, chips: a.chips || null, fields: a.fields || null, grid: a.grid ? { ...a.grid } : null, pose: a.pose ? { ...a.pose } : null, tag: a.tag, small: a.small, where: a.at, dx: a.dx || 0, dy: a.dy || 0 };
+    CARDS.set(a.card, cd); renderCard(cd); at(cd, center(a.at, cd.dx, cd.dy));
+    await anim(el, [{ opacity: 0, transform: "translate(-50%,-50%) scale(.6)" }, { opacity: 1, transform: "translate(-50%,-50%) scale(1)" }], 450); },
+  async move(a) { const cd = card(a.card); const from = cd.where; cd.dx = a.dx ?? 0; cd.dy = a.dy ?? 0; const to = center(a.to, cd.dx, cd.dy);
+    const top = (n) => n && (n.startsWith("room:") ? M.stage.roomsIn : n);
+    const hot = [top(from), top(a.to)]; drawLinks(hot);
+    let lab = null; if (a.label && !INSTANT) { lab = document.createElement("div"); lab.className = "label"; lab.textContent = a.label; stage.appendChild(lab); }
+    const p0 = { x: cd.x, y: cd.y }; const dist = Math.hypot(to.x - p0.x, to.y - p0.y); const ms = Math.max(600, Math.min(1700, dist * 2.4));
+    const mid = { x: (p0.x + to.x) / 2, y: Math.min(p0.y, to.y) - Math.min(90, dist / 5) };
+    const kf = [{ left: p0.x + "px", top: p0.y + "px" }, { left: mid.x + "px", top: mid.y + "px", offset: .5 }, { left: to.x + "px", top: to.y + "px" }];
+    const jobs = [anim(cd.el, kf, ms)];
+    if (lab) jobs.push(anim(lab, [{ left: p0.x + "px", top: p0.y - 34 + "px" }, { left: mid.x + "px", top: mid.y - 34 + "px", offset: .5 }, { left: to.x + "px", top: to.y - 34 + "px" }], ms));
+    try { await Promise.all(jobs); } finally { lab && lab.remove(); }
+    cd.x = to.x; cd.y = to.y; cd.where = a.to; drawLinks(); },
+  async chips(a) { const cd = card(a.card); cd._from = null; await flipChips(cd, () => { cd.chips = a.value; cd.text = null; });
+    if (!INSTANT) { const els = cd.el.querySelectorAll(".chip"); await Promise.all([...els].map((e, i) => anim(e, [{ opacity: 0, transform: "translateY(8px)" }, { opacity: 0, offset: Math.min(.9, i * .2) }, { opacity: 1, transform: "none" }], 700))); } },
+  async swap(a) { const cd = card(a.card); cd._from = null; await flipChips(cd, () => { cd.chips = a.value; });
+    const els = cd.el.querySelectorAll(".chip"); for (const i of a.mark || []) els[i] && els[i].classList.add("hot");
+    if (!INSTANT) { await Promise.all((a.mark || []).map((i) => els[i] && anim(els[i], [{ transform: "rotateX(90deg)" }, { transform: "rotateX(0)" }], 500))); await sleep(700); }
+    els.forEach((e) => e.classList.remove("hot")); },
+  async drop(a) { const cd = card(a.card); const els = cd.el.querySelectorAll(".chip"); for (const i of a.idx) els[i] && els[i].classList.add("hot");
+    if (!INSTANT) await Promise.all(a.idx.map((i) => els[i] && anim(els[i], [{ opacity: 1 }, { opacity: 1, offset: .5 }, { opacity: 0, transform: "translateY(-14px)" }], 900)));
+    const keep = cd.chips.map((_, i) => i).filter((i) => !a.idx.includes(i)); cd._from = keep; await flipChips(cd, () => { cd.chips = keep.map((i) => cd.chips[i]); }); cd._from = null; },
+  async order(a) { const cd = card(a.card); const old = cd.chips.slice(); const used = new Set();
+    cd._from = a.value.map((v) => { const j = old.findIndex((o, k) => o === v && !used.has(k)); used.add(j); return j; });
+    await flipChips(cd, () => { cd.chips = a.value; }); cd._from = null;
+    if (a.mark) { const els = cd.el.querySelectorAll(".chip"); a.mark.forEach((i) => els[i] && els[i].classList.add("hot")); await sleep(900); els.forEach((e) => e.classList.remove("hot")); } },
+  async tag(a) { const cd = card(a.card); if ("text" in a) cd.tag = a.text; if ("badge" in a) cd.badge = a.badge; if ("small" in a) cd.small = a.small; renderCard(cd);
+    if (!INSTANT) await anim(cd.el, [{ transform: "translate(-50%,-50%) scale(1.12)" }, { transform: "translate(-50%,-50%) scale(1)" }], 400); },
+  async text(a) { const cd = card(a.card); cd.chips = null; cd.fields = cd.grid = cd.pose = null; cd.text = a.value; renderCard(cd); if (!INSTANT) await anim(cd.el, [{ opacity: .3 }, { opacity: 1 }], 400); },
+  async wait(a) { const el = NODES[a.node].el; el.querySelector(".bt").textContent = a.text || "기다리는 중"; el.classList.add("wait"); try { await sleep(a.ms || 1200); } finally { el.classList.remove("wait"); } },
+  async score(a) { const cd = card(a.card); const els = cd.el.querySelectorAll(".chip");
+    for (let i = 0; i < els.length; i++) { const m = document.createElement("span"); m.className = "mk"; m.textContent = a.hits[i] ? "✅" : "❌"; els[i].appendChild(m); if (!INSTANT) await sleep(260); }
+    cd.badge = a.text; const keepMarks = [...cd.el.querySelectorAll(".mk")].map((m) => m.textContent); renderCard(cd);
+    cd.el.querySelectorAll(".chip").forEach((e, i) => { const m = document.createElement("span"); m.className = "mk"; m.textContent = keepMarks[i] || ""; e.appendChild(m); }); cd.marks = keepMarks;
+    if (!INSTANT) await sleep(300); },
+  async pick(a) { for (const c of CARDS.values()) if (a.others.includes(c.id)) { c.dim = true; renderCard(c); restoreMarks(c); }
+    const cd = card(a.card); cd.win = true; renderCard(cd); restoreMarks(cd); if (!INSTANT) await anim(cd.el, [{ transform: "translate(-50%,-50%) scale(1)" }, { transform: "translate(-50%,-50%) scale(1.15)" }, { transform: "translate(-50%,-50%) scale(1)" }], 700); },
+  async clear(a) { const cd = card(a.card); for (const k of ["badge", "win", "dim", "marks", "ghost"]) delete cd[k]; renderCard(cd); },
+  async remove(a) { for (const id of a.cards) { const cd = CARDS.get(id); if (!cd) continue; if (!INSTANT) await anim(cd.el, [{ opacity: 1 }, { opacity: 0 }], 350).catch((e) => { throw e; }); cd.el.remove(); CARDS.delete(id); } },
+  async note(a) { const el = document.createElement("div"); el.className = "note"; el.innerHTML = rich(a.text); const p = center(a.at, a.dx || 0, a.dy || 0); el.style.left = p.x + "px"; el.style.top = p.y + "px"; el.dataset.note = a.id || ""; stage.appendChild(el);
+    if (!INSTANT) await anim(el, [{ opacity: 0 }, { opacity: 1 }], 350); if (a.ms && !INSTANT) { await sleep(a.ms); el.remove(); } else if (a.ms) el.remove(); },
+  async unnote(a) { stage.querySelectorAll(".note").forEach((e) => { if (!a.id || e.dataset.note === a.id) e.remove(); }); },
+  async fetch(a) { // 칩 하나씩 바깥 상자에 다녀오며 표시를 받아 온다
+    const cd = card(a.card); const n = cd.chips.length;
+    for (let i = 0; i < n; i++) {
+      const word = String(cd.chips[i]).split("/")[0];
+      const el = document.createElement("div"); el.className = "card small"; stage.appendChild(el);
+      const tmp = { id: "_f", el, text: (a.ask || "{w}").replace("{w}", word), small: true }; renderCard(tmp); at(tmp, { x: cd.x, y: cd.y + 34 });
+      CARDS.set("_f", Object.assign(tmp, { where: cd.where }));
+      try {
+        await A.move({ card: "_f", to: a.to, label: a.label ? a.label.replace("{w}", word) : null });
+        if (a.wait) await A.wait({ node: a.to, ms: a.wait, text: a.waitText });
+        tmp.text = (a.back || "{w}").replace("{w}", word); renderCard(tmp);
+        await A.move({ card: "_f", to: cd.where, dy: 34 });
+      } finally { el.remove(); CARDS.delete("_f"); }
+      cd.chips[i] = word + (a.mark ? " " + a.mark : ""); renderCard(cd);
+    } },
+  async play(a) { // 앱 화면의 두 칸(A·B)을 번갈아 쓰며 영상을 이어 튼다
+    const scr = NODES[a.node].el.querySelector(".screen"); const pl = scr.querySelector(".player"); scr.classList.add("playing");
+    pl.innerHTML = `<div class="slot a"><span class="tag">칸 A</span><span class="hand">🤟</span><span class="w"></span><span class="bar"></span></div><div class="slot b"><span class="tag">칸 B</span><span class="hand">🖐️</span><span class="w"></span><span class="bar"></span></div>`;
+    const [sa, sb] = pl.querySelectorAll(".slot"); const slots = [sa, sb];
+    const show = (s, on) => { s.style.transform = on ? "translateX(0)" : "translateX(100%)"; s.style.zIndex = on ? 2 : 1; };
+    const words = a.words; const dur = a.clip || 1800;
+    slots[0].querySelector(".w").textContent = words[0]; show(sa, true); show(sb, false);
+    if (INSTANT) { const last = (words.length - 1) % 2; slots[last].querySelector(".w").textContent = words[words.length - 1]; show(slots[last], true); show(slots[1 - last], false); slots[last].querySelector(".bar").style.width = "100%"; return; }
+    for (let i = 0; i < words.length; i++) {
+      const cur = slots[i % 2], nxt = slots[(i + 1) % 2];
+      say((a.says && a.says[i]) || "");
+      if (i + 1 < words.length) { nxt.querySelector(".w").textContent = words[i + 1]; nxt.querySelector(".tag").textContent = (i % 2 ? "칸 A" : "칸 B") + " · 미리 준비"; }
+      cur.querySelector(".tag").textContent = (i % 2 ? "칸 B" : "칸 A") + " · 재생 중";
+      const bar = cur.querySelector(".bar"); bar.style.width = "0";
+      await anim(bar, [{ width: "0%" }, { width: "92%" }], dur * .92, "linear");
+      if (i + 1 < words.length) {
+        await Promise.all([anim(cur, [{ transform: "translateX(0)" }, { transform: "translateX(-100%)" }], 420), anim(nxt, [{ transform: "translateX(100%)" }, { transform: "translateX(0)" }], 420)]);
+        cur.style.zIndex = 1; nxt.style.zIndex = 2;
+      } else { await anim(bar, [{ width: "92%" }, { width: "100%" }], dur * .08, "linear"); cur.querySelector(".tag").textContent += " · 끝"; }
+    } },
+  async screen(a) { const scr = NODES[a.node].el.querySelector(".screen"); scr.classList.remove("playing"); const pl = scr.querySelector(".player");
+    scr.innerHTML = (a.title ? `<div class="stitle">${esc(a.title)}</div>` : "") + (a.items || []).map((x) => `<div class="sitem">${esc(x)}</div>`).join("") +
+      (a.input != null ? `<div class="inp">${esc(a.input)}</div>` : "") + (a.button ? `<div class="btn">${esc(a.button)}</div>` : "");
+    scr.appendChild(pl || Object.assign(document.createElement("div"), { className: "player" }));
+    if (!INSTANT) await anim(scr, [{ opacity: .2 }, { opacity: 1 }], 350); },
+  async field(a) { const cd = card(a.card); const old = cd.fields || []; cd.fields = a.fields;
+    cd.fmark = a.mark || a.fields.map((f, i) => (!old[i] || old[i][0] !== f[0] || old[i][1] !== f[1]) ? i : -1).filter((i) => i >= 0);
+    renderCard(cd); if (!INSTANT) { await anim(cd.el, [{ transform: "translate(-50%,-50%) scale(1.06)" }, { transform: "translate(-50%,-50%) scale(1)" }], 450); await sleep(900); }
+    cd.fmark = []; renderCard(cd); },
+  async regrid(a) { const cd = card(a.card); const g = cd.grid; const hadHoles = holeSet(g);
+    const next = { ...g }; for (const k of ["rows", "cols", "label", "holes", "hl"]) if (k in a) next[k] = a[k];
+    if (!INSTANT) await anim(cd.el, [{ transform: "translate(-50%,-50%) scale(1)", opacity: 1 }, { transform: "translate(-50%,-50%) scale(.82)", opacity: .35 }], 380);
+    cd.filled = (g.rows === next.rows && g.cols === next.cols && (next.holes || 0) < (g.holes || 0)) ? [...hadHoles].filter((i) => !holeSet(next).has(i)) : [];
+    cd.grid = next; renderCard(cd);
+    if (!INSTANT) { await anim(cd.el, [{ transform: "translate(-50%,-50%) scale(.82)", opacity: .35 }, { transform: "translate(-50%,-50%) scale(1)", opacity: 1 }], 420); if (cd.filled.length) await sleep(900); }
+    cd.filled = []; renderCard(cd); },
+  async posefx(a) { const cd = card(a.card); const p = cd.pose; const ms = a.ms || 1400; const r = () => renderCard(cd);
+    if (a.fx === "jitter") { p.noise = 1; p.finger = 1; p.off = p.off && p.off.s !== 1 ? p.off : { x: 10, y: -6, r: -9, s: 1.12 }; r();
+      if (!INSTANT) { const svg = cd.el.querySelector("svg"); await anim(svg, [0, 1, 2, 3, 4, 5, 6, 7].map((i) => ({ transform: `translate(${(i % 2 ? 1.5 : -1.5)}px,${(i % 3 ? -1 : 1)}px)` })).concat([{ transform: "none" }]), ms, "linear"); } }
+    else if (a.fx === "calm") { const n0 = p.noise || 0; await tween(ms, (k) => { p.noise = n0 * (1 - k); r(); }); }
+    else if (a.fx === "fix") { const f0 = p.finger || 0; await tween(ms, (k) => { p.finger = f0 * (1 - k); r(); }); }
+    else if (a.fx === "center") { const o0 = p.off || { x: 0, y: 0, r: 0, s: 1 }; await tween(ms, (k) => { p.off = { x: o0.x * (1 - k), y: o0.y * (1 - k), r: o0.r * (1 - k), s: o0.s + (1 - o0.s) * k }; r(); }); p.off = { x: 0, y: 0, r: 0, s: 1 }; r(); }
+    else if (a.fx === "ghost") { cd.ghost = true; r(); if (!INSTANT) await anim(cd.el, [{ opacity: 1 }, { opacity: .6 }, { opacity: 1 }], 500); }
+    else if (a.fx === "sign") { if (INSTANT) return; const lh = cd.el.querySelector(".hand.lh"), rh = cd.el.querySelector(".hand.rh");
+      const path = (s) => [{ transform: "translate(0,0)" }, { transform: `translate(${8 * s}px,-34px)` }, { transform: `translate(${16 * s}px,-46px)` }, { transform: `translate(${4 * s}px,-30px)` }, { transform: `translate(${12 * s}px,-40px)` }, { transform: "translate(0,0)" }];
+      await Promise.all([anim(rh, path(-1), ms), anim(lh, path(1), ms * 1.05)]); } },
+  async say(a) { say(a.text); if (a.ms && !INSTANT) await sleep(a.ms); },
+  async pause(a) { await sleep(a.ms || 800); },
+};
+function restoreMarks(cd) { if (!cd.marks) return; cd.el.querySelectorAll(".chip").forEach((e, i) => { const m = document.createElement("span"); m.className = "mk"; m.textContent = cd.marks[i] || ""; e.appendChild(m); }); }
+const _render = renderCard; // 표시(✅)가 renderCard 뒤에도 남게
+renderCard = function (cd) { _render(cd); restoreMarks(cd); };
+
+/* ── 장면 실행 */
+async function runScene(i, instant) {
+  const sc = M.scenes[i]; INSTANT = instant; if (!instant) say(sc.say);
+  for (const a of sc.actions) { if (!instant && a.say) say(a.say); await A[a.do](a); if (!instant && a.after) await sleep(a.after); }
+  INSTANT = false;
+}
+async function goto(i, { play = ST.playing, end = false } = {}) {
+  ST.tok++; const tk = ST.tok; for (const a of live) { try { a.cancel(); } catch (e) {} } live.clear();
+  $("#end").classList.remove("show");
+  i = Math.max(0, Math.min(M.scenes.length - 1, i)); ST.scene = i;
+  buildStage();
+  for (let k = 0; k < i; k++) await runScene(k, true);
+  renderSide(); renderTimeline();
+  if (end) { await runScene(i, true); say(M.scenes[i].say); markSeen(i); setPlaying(false); return; }
+  setPlaying(play); say(M.scenes[i].say);
+  if (!play) { // 멈춘 채로 왔으면 이 장면의 첫 모습만 준비해 두고 재생을 기다린다
+    ST.pending = true; return; }
+  await playFrom(tk);
+}
+async function playFrom(tk) {
+  ST.pending = false;
+  try {
+    await runScene(ST.scene, false); if (tk !== ST.tok) return;
+    markSeen(ST.scene);
+    if (ST.scene + 1 < M.scenes.length) {
+      if ($("#auto").checked) { await sleep(1300); if (tk !== ST.tok) return; await goto(ST.scene + 1, { play: true }); }
+      else { setPlaying(false); say(M.scenes[ST.scene].say + " <span style='opacity:.7'>— 다음 장면은 ⏭ 또는 → 키</span>"); ST.doneScene = true; }
+    } else { setPlaying(false); showEnd(); }
+  } catch (e) { if (e !== ABORT) { console.error(e); throw e; } }
+}
+function markSeen(i) { ST.seen.add(M.scenes[i].id); store.set("seen", [...ST.seen]); store.set("last", i); renderTimeline(); }
+function togglePlay() {
+  if (ST.playing) { setPlaying(false); return; }
+  if (ST.doneScene) { ST.doneScene = false; goto(ST.scene + 1, { play: true }); return; }
+  if ($("#end").classList.contains("show")) { goto(0, { play: true }); return; }
+  setPlaying(true); if (ST.pending) playFrom(ST.tok);
+}
+
+/* ── 화면 그리기 */
+function renderTimeline() {
+  const t = $("#tline"); t.innerHTML = M.scenes.map((s, i) => `<button class="tl ${i === ST.scene ? "cur" : ""} ${ST.seen.has(s.id) ? "seen" : ""}" data-i="${i}"><span class="n">${i + 1}</span>${esc(s.title)}</button>`).join("");
+  t.querySelectorAll(".tl").forEach((b) => b.onclick = () => goto(+b.dataset.i, { play: true }));
+  const cur = t.querySelector(".cur"); cur && cur.scrollIntoView({ block: "nearest", inline: "nearest" });
+  $("#pos").textContent = `장면 ${ST.scene + 1} / ${M.scenes.length} · 본 장면 ${ST.seen.size}`;
+}
+function renderSide() {
+  const s = M.scenes[ST.scene]; const T = M.terms || {};
+  const refs = (s.code || []).map((r) => `<div class="ref"><div class="fh">${esc(r.file)} : ${r.lines[0]}–${r.lines[1]}</div>${r.why ? `<div class="why">${rich(r.why)}</div>` : ""}<pre>${(r.src || []).map((l, k) => `<span class="ln">${r.lines[0] + k}</span>${esc(l)}`).join("\n")}</pre></div>`).join("");
+  $("#side").innerHTML = `
+    <div><div class="k">장면 ${ST.scene + 1}</div><h2>${esc(s.title)}</h2></div>
+    <div class="exp">${rich(s.explain || s.say)}</div>
+    ${s.carry ? `<div><div class="k">지금 들고 다니는 것</div><div class="carry">${rich(s.carry)}</div></div>` : ""}
+    ${(s.terms || []).length ? `<div><div class="k">어려운 말</div><div class="terms">${s.terms.map((t) => `<button class="term" data-t="${esc(t)}">${esc((T[t] || {}).name || t)}</button>`).join("")}</div><div class="tdef" id="tdef" hidden></div></div>` : ""}
+    ${refs ? `<details class="code" ${store.get("codeOpen", false) ? "open" : ""}><summary>이 장면의 진짜 코드 (${s.code.length})</summary>${refs}</details>` : ""}
+    <div class="next"><kbd>Space</kbd> 재생·멈춤 · <kbd>←</kbd><kbd>→</kbd> 장면 · <kbd>R</kbd> 다시</div>`;
+  $("#side").querySelectorAll(".term").forEach((b) => b.onclick = () => { const d = $("#tdef"); const open = b.classList.contains("open");
+    $("#side").querySelectorAll(".term").forEach((x) => x.classList.remove("open")); if (open) { d.hidden = true; return; }
+    b.classList.add("open"); d.hidden = false; d.innerHTML = rich((T[b.dataset.t] || {}).say || ""); });
+  const det = $("#side details"); det && det.addEventListener("toggle", () => store.set("codeOpen", det.open));
+}
+function showEnd() {
+  const e = M.ending || {}; $("#endin").innerHTML = `<h3>${esc(e.title || "한 번에 정리")}</h3><ol>${(e.points || []).map((p) => `<li>${rich(p)}</li>`).join("")}</ol>
+    <div class="acts"><button class="cbtn main" id="again">↺ 처음부터 다시</button>${(e.links || []).map((l) => `<a class="cbtn" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.name)} ↗</a>`).join("")}</div>`;
+  $("#end").classList.add("show"); $("#again").onclick = () => goto(0, { play: true }); say(e.say || "끝! 장면 목록을 눌러 궁금한 장면만 다시 볼 수 있어요.");
+}
+
+/* ── 극장: 영화 고르기 */
+function seenOf(m) { return new Set(ls.get("codemovie." + m.key + ".seen", [])); }
+function showHome() {
+  ST.tok++; for (const a of live) { try { a.cancel(); } catch (e) {} } live.clear(); setPlaying(false);
+  const h = $("#home"); const T = THEATER || {}; const groups = [];
+  MOVIES.forEach((m, i) => { const g = m.group || ""; let G = groups.find((x) => x.name === g); if (!G) groups.push(G = { name: g, items: [] }); G.items.push(i); });
+  h.innerHTML = `<div class="hero"><h1>🎬 ${esc(T.title || "극장")}</h1><p>${rich(T.subtitle || "")}</p></div>` + groups.map((G) => `${G.name ? `<h2>${esc(G.name)}</h2>` : ""}<div class="mgrid">${G.items.map((i) => { const m = MOVIES[i]; const s = seenOf(m); const n = m.scenes.length; const k = m.scenes.filter((x) => s.has(x.id)).length;
+    return `<button class="mcard" data-i="${i}"><span class="mi">${esc(m.icon || "🎬")}</span><span class="mt">${esc(m.title)}</span><span class="ms">${esc(m.story || "")}</span><span class="mm"><span>장면 ${n}</span><span>${k ? (k >= n ? "다 봤어요 ✓" : "본 장면 " + k + " / " + n) : "아직 안 봤어요"}</span></span><span class="bar"><i style="width:${Math.round(100 * k / n)}%"></i></span></button>`; }).join("")}</div>`).join("");
+  h.querySelectorAll(".mcard").forEach((b) => b.onclick = () => openMovie(+b.dataset.i));
+  h.hidden = false; $("#player").hidden = true; $("#bHome").hidden = true; $("#autoWrap").hidden = true;
+  $("#ttl").textContent = ""; $("#story").textContent = ""; document.title = T.title || "극장";
+  try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
+}
+function openMovie(i, opts = {}) {
+  M = MOVIES[i]; KEY = "codemovie." + (M.key || M.id || "movie"); ST.seen = new Set(store.get("seen", [])); ST.doneScene = false;
+  $("#home").hidden = true; $("#player").hidden = false; $("#bHome").hidden = MOVIES.length < 2; $("#autoWrap").hidden = false;
+  $("#ttl").textContent = (M.icon || "🎬") + " " + M.title; $("#story").textContent = M.story || ""; document.title = M.title;
+  if (MOVIES.length > 1) { try { history.replaceState(null, "", "#" + M.id); } catch (e) {} }
+  fit(); const start = opts.scene != null ? opts.scene : 0;
+  const p = goto(start, { play: false }); say(M.intro || "▶ 재생을 누르면 시작해요."); return p;
+}
+
+/* ── 시작 */
+$("#bHome").onclick = showHome;
+$("#bPlay").onclick = togglePlay;
+$("#bPrev").onclick = () => goto(ST.scene - 1, { play: true });
+$("#bNext").onclick = () => goto(ST.scene + 1, { play: true });
+$("#bRe").onclick = () => goto(ST.scene, { play: true });
+document.querySelectorAll("#speed button").forEach((b) => b.onclick = () => setRate(+b.dataset.r));
+$("#auto").checked = gstore.get("auto", true); $("#auto").onchange = () => gstore.set("auto", $("#auto").checked);
+document.addEventListener("keydown", (e) => {
+  if (e.target.closest("input,textarea") || !$("#home").hidden) return;
+  if (e.key === " ") { e.preventDefault(); togglePlay(); }
+  else if (e.key === "ArrowRight") goto(ST.scene + 1, { play: true });
+  else if (e.key === "ArrowLeft") goto(ST.scene - 1, { play: true });
+  else if (e.key === "r" || e.key === "R") goto(ST.scene, { play: true });
+});
+setRate(gstore.get("rate", 1)); fit();
+window.MOVIE = { goto, ST, showEnd, showHome, openMovie, get M() { return M; }, MOVIES };
+{ const want = (location.hash || "").slice(1); const wi = MOVIES.findIndex((m) => m.id === want);
+  if (MOVIES.length < 2) openMovie(0); else if (wi >= 0) openMovie(wi); else showHome(); }
+</script>

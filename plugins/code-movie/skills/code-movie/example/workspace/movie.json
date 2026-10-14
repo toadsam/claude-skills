@@ -1,0 +1,179 @@
+{
+  "id": "add",
+  "icon": "📝",
+  "title": "할 일 추가 영화",
+  "story": "'우유 사기' 한 줄이 화면에서 서버와 메모리를 다녀와 목록 맨 위에 붙기까지",
+  "subtitle": "입력칸에 쓴 글자가 번호를 받아 돌아오는 길",
+  "key": "todo-example-add",
+  "repo": "../repo",
+  "intro": "입력칸에 '우유 사기'를 쓰고 추가 버튼을 누르면 무슨 일이 일어나는지 따라가 볼게요. 코드는 몰라도 괜찮아요. 궁금하면 오른쪽 「이 장면의 진짜 코드」를 열어 보세요.",
+  "stage": {
+    "nodes": [
+      { "id": "app", "kind": "app", "icon": "🖥️", "name": "웹 화면", "sub": "web/ · React", "button": "추가",
+        "x": 30, "y": 150, "w": 280, "h": 420 },
+      { "id": "server", "kind": "server", "icon": "⚙️", "name": "API 서버", "sub": "server/ · Express",
+        "x": 420, "y": 170, "w": 380, "h": 320, "zoom": { "x": 340, "y": 120, "w": 560, "h": 480 } },
+      { "id": "db", "kind": "db", "icon": "🗄️", "name": "메모리 db", "sub": "server/src/db.ts · 배열",
+        "x": 920, "y": 230, "w": 250, "h": 200 }
+    ],
+    "roomsIn": "server",
+    "rooms": [
+      { "id": "gate", "n": 1, "name": "공통 준비", "sub": "cors · express.json" },
+      { "id": "route", "n": 2, "name": "접수 창구", "sub": "app.post('/todos')" },
+      { "id": "svc", "n": 3, "name": "할 일 만들기", "sub": "todoService.createTodo" }
+    ],
+    "links": [["app", "server"], ["server", "db"]]
+  },
+  "terms": {
+    "http": { "name": "HTTP 요청", "say": "브라우저가 서버에 보내는 편지예요. 겉봉에 **POST /todos** 처럼 무엇을 하려는지와 주소가 적혀 있어요." },
+    "json": { "name": "JSON", "say": "객체를 글자로 적는 약속이에요. `{\"title\":\"우유 사기\"}` 처럼 생겼어요." },
+    "status": { "name": "응답 번호", "say": "서버가 답장에 붙이는 숫자예요. **201** 은 새로 만들었다, **400** 은 요청이 잘못됐다는 뜻이에요." }
+  },
+  "scenes": [
+    {
+      "id": "type", "title": "입력하고 누르기",
+      "say": "입력칸에 '우유 사기'를 쓰고 **추가** 버튼을 눌러요.",
+      "explain": "입력칸은 글자가 바뀔 때마다 그 글자를 화면의 기억(text)에 넣어요. 버튼을 누르면 추가 처리를 맡은 함수가 불려요.",
+      "carry": "입력한 글자 '우유 사기'",
+      "actions": [
+        { "do": "focus", "node": "app" },
+        { "do": "screen", "node": "app", "title": "할 일", "items": ["빨래 개기"], "input": "", "button": "추가" },
+        { "do": "type", "node": "app", "text": "우유 사기" },
+        { "do": "press", "node": "app", "label": "추가" }
+      ],
+      "code": [
+        { "file": "web/src/TodoList.tsx", "lines": [27, 28], "why": "27줄 입력칸이 글자를 text 에 넣고, 28줄 버튼이 handleAdd 를 불러요." }
+      ]
+    },
+    {
+      "id": "trim", "title": "글자 다듬기",
+      "say": "앞뒤 빈칸을 잘라 내고, 빈 글자면 여기서 멈춰요. '우유 사기'는 통과해요.",
+      "explain": "실수로 빈칸만 쓰고 누르면 서버에 보낼 필요가 없어요. 그래서 화면에서 먼저 한 번 걸러요.",
+      "carry": "title = '우유 사기'",
+      "actions": [
+        { "do": "show", "card": "t", "at": "app", "text": "우유 사기", "dy": 130, "tag": "title" },
+        { "do": "note", "id": "ok", "text": "빈 글자가 아니에요 → 계속", "at": "app", "dy": 30, "ms": 1500 }
+      ],
+      "code": [
+        { "file": "web/src/TodoList.tsx", "lines": [13, 15], "why": "14줄 trim() 으로 앞뒤 빈칸을 자르고, 15줄에서 비었으면 돌아가요." }
+      ]
+    },
+    {
+      "id": "send", "title": "서버로 편지 보내기",
+      "say": "글자를 **JSON** 으로 바꿔 편지에 담고, 서버로 보내요.",
+      "explain": "api.ts 가 서버 주소 뒤에 /todos 를 붙여 POST 요청을 보내요. 본문에는 {\"title\":\"우유 사기\"} 가 들어가요. 답이 올 때까지 화면은 기다리지만 멈추지는 않아요.",
+      "carry": "POST /todos, 본문 {\"title\":\"우유 사기\"}",
+      "terms": ["http", "json"],
+      "actions": [
+        { "do": "text", "card": "t", "value": "{\"title\":\"우유 사기\"}" },
+        { "do": "move", "card": "t", "to": "server", "label": "POST /todos", "dy": -40 }
+      ],
+      "code": [
+        { "file": "web/src/TodoList.tsx", "lines": [16, 17], "why": "17줄에서 addTodo 의 답을 await 로 기다려요." },
+        { "file": "web/src/api.ts", "lines": [11, 16], "why": "12줄 fetch 가 POST 를 보내고, 15줄에서 { title } 을 JSON 글자로 바꿔요." }
+      ]
+    },
+    {
+      "id": "gate", "title": "서버의 공통 준비",
+      "say": "서버 안으로 들어가 볼게요. 먼저 공통 준비를 거치며 편지 본문이 다시 객체가 돼요.",
+      "explain": "cors 는 다른 주소(웹 화면)에서 온 요청을 받아 주도록 허락해요. express.json() 은 본문 글자를 객체로 바꿔 req.body 에 넣어요.",
+      "carry": "req.body = { title: '우유 사기' }",
+      "terms": ["json"],
+      "actions": [
+        { "do": "zoom" },
+        { "do": "move", "card": "t", "to": "room:gate" },
+        { "do": "focus", "node": "room:gate" },
+        { "do": "remove", "cards": ["t"] },
+        { "do": "show", "card": "body", "at": "room:gate", "fields": [["title", "우유 사기"]], "tag": "req.body" }
+      ],
+      "code": [
+        { "file": "server/src/app.ts", "lines": [5, 7], "why": "6줄 cors, 7줄 express.json() 이 모든 요청에 먼저 걸려요." }
+      ]
+    },
+    {
+      "id": "check", "title": "서버가 한 번 더 검사",
+      "say": "접수 창구에서 제목이 글자인지, 비어 있지 않은지 다시 봐요.",
+      "explain": "화면에서 이미 걸렀어도 서버는 화면을 믿지 않아요. 누구든 화면을 거치지 않고 직접 요청을 보낼 수 있기 때문이에요. 통과하지 못하면 400 으로 돌려보내요.",
+      "carry": "검사를 통과한 title",
+      "terms": ["status"],
+      "actions": [
+        { "do": "move", "card": "body", "to": "room:route" },
+        { "do": "focus", "node": "room:route" },
+        { "do": "note", "id": "v", "text": "글자 맞음, 비어 있지 않음 → 통과", "at": "room:route", "dy": 60, "ms": 1600 }
+      ],
+      "code": [
+        { "file": "server/src/app.ts", "lines": [13, 17], "why": "14줄에서 title 을 꺼내고, 15–16줄에서 아니면 400 을 돌려줘요." }
+      ]
+    },
+    {
+      "id": "make", "title": "번호 붙이기",
+      "say": "할 일 만들기 방에서 번호 **1** 을 붙이고, 아직 안 끝났다는 표시를 달아요.",
+      "explain": "nextId 는 처음에 1 이에요. 이번 할 일이 1 을 쓰고 nextId 는 2 가 돼요. 제목은 200자까지만 남겨요.",
+      "carry": "{ id: 1, title: '우유 사기', done: false }",
+      "actions": [
+        { "do": "move", "card": "body", "to": "room:svc" },
+        { "do": "focus", "node": "room:svc" },
+        { "do": "field", "card": "body", "fields": [["id", "1"], ["title", "우유 사기"], ["done", "false"]], "mark": [0, 2] }
+      ],
+      "code": [
+        { "file": "server/src/todoService.ts", "lines": [7, 11], "why": "8줄에서 nextId 를 쓰고 1 올리며, 제목을 200자로 자르고 done 은 false 예요." }
+      ]
+    },
+    {
+      "id": "store", "title": "메모리에 넣기",
+      "say": "새 할 일이 메모리 db 배열에 들어가요. 진짜 DB 가 아니라서 서버를 끄면 사라져요.",
+      "explain": "예시 앱이라 데이터베이스 대신 서버 메모리의 배열을 써요. push 로 넣은 뒤 같은 할 일을 그대로 돌려줘요.",
+      "carry": "db.todos 에 1번 할 일",
+      "actions": [
+        { "do": "unzoom" },
+        { "do": "move", "card": "body", "to": "db", "label": "push" },
+        { "do": "focus", "node": "db" },
+        { "do": "note", "id": "mem", "text": "서버를 끄면 사라지는 기억", "at": "db", "dy": 80, "ms": 1600 }
+      ],
+      "code": [
+        { "file": "server/src/db.ts", "lines": [3, 7], "why": "진짜 DB 대신 메모리 배열을 쓴다고 주석에 적혀 있어요." },
+        { "file": "server/src/todoService.ts", "lines": [9, 10], "why": "9줄에서 배열에 넣고 10줄에서 돌려줘요." }
+      ]
+    },
+    {
+      "id": "reply", "title": "201 로 답장",
+      "say": "서버가 **201** 번호를 붙여 새 할 일을 화면으로 돌려보내요.",
+      "explain": "201 은 '새로 만들었어요'라는 뜻이에요. 답장 본문에는 번호가 붙은 할 일이 JSON 으로 들어 있어요. api.ts 는 답이 정상인지 보고 객체로 바꿔요.",
+      "carry": "201 {\"id\":1,\"title\":\"우유 사기\",\"done\":false}",
+      "terms": ["status", "json"],
+      "actions": [
+        { "do": "move", "card": "body", "to": "app", "label": "201 Created", "dy": 130 },
+        { "do": "tag", "card": "body", "text": "응답 본문", "badge": "201" }
+      ],
+      "code": [
+        { "file": "server/src/app.ts", "lines": [18, 18], "why": "createTodo 의 결과를 201 과 함께 JSON 으로 보내요." },
+        { "file": "web/src/api.ts", "lines": [17, 18], "why": "res.ok 가 아니면 오류를 던지고, 맞으면 JSON 을 객체로 바꿔요." }
+      ]
+    },
+    {
+      "id": "show", "title": "목록 맨 위에",
+      "say": "새 할 일이 목록 **맨 위** 에 붙고, 입력칸은 비워져요.",
+      "explain": "기존 목록 앞에 새 할 일을 붙인 새 배열을 화면의 기억에 넣어요. 기억이 바뀌면 React 가 화면을 다시 그려요.",
+      "carry": "화면 목록 = ['우유 사기', '빨래 개기']",
+      "actions": [
+        { "do": "remove", "cards": ["body"] },
+        { "do": "screen", "node": "app", "title": "할 일", "items": ["우유 사기", "빨래 개기"], "input": "", "button": "추가" },
+        { "do": "note", "id": "done", "text": "맨 위에 새로 붙었어요", "at": "app", "dy": -40, "ms": 1800 }
+      ],
+      "code": [
+        { "file": "web/src/TodoList.tsx", "lines": [18, 19], "why": "18줄에서 새 할 일을 맨 앞에 붙이고, 19줄에서 입력칸을 비워요." }
+      ]
+    }
+  ],
+  "ending": {
+    "title": "한 번에 정리",
+    "say": "끝이에요. 아래 타임라인에서 궁금한 장면만 다시 볼 수 있어요.",
+    "points": [
+      "화면은 빈 글자를 먼저 거르고, 글자를 **JSON** 으로 바꿔 POST /todos 로 보내요.",
+      "서버는 화면을 믿지 않고 제목을 **한 번 더 검사** 해요.",
+      "번호는 서버가 붙여요. 처음 할 일은 **1** 번이에요.",
+      "이 예시는 진짜 DB 대신 **메모리 배열** 이라 서버를 끄면 사라져요.",
+      "답장 번호 **201** 을 받으면 화면이 새 할 일을 맨 위에 붙여요."
+    ]
+  }
+}

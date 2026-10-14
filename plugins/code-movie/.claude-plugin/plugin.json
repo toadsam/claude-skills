@@ -1,0 +1,7 @@
+{
+  "name": "code-movie",
+  "version": "0.1.0",
+  "description": "저장소의 중요한 흐름 하나를 앱 · 서버 · DB 상자 사이를 값이 오가는 애니메이션(코드 영화)으로 만들어요. 장면마다 실제 파일:줄 근거가 붙어요.",
+  "license": "MIT",
+  "keywords": ["korean", "animation", "learning", "artifact"]
+}

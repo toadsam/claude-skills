@@ -1,15 +1,16 @@
 # study-my-code — 내 프로젝트를 AI 없이 이해하기 위한 Claude Code 스킬
 
 AI 와 같이 만든 프로젝트는 돌아가긴 하는데, "이 줄이 왜 있어요?"라는 질문에는 막히기 쉬워요.
-이 저장소의 스킬 3개는 **내 저장소의 실제 코드**를 근거로 공부 자료를 만들어 줘요. 결과물은 Claude 의 Artifact(인터랙티브 HTML 페이지)예요.
+이 저장소의 스킬 4개는 **내 저장소의 실제 코드**를 근거로 공부 자료를 만들어 줘요. 결과물은 Claude 의 Artifact(인터랙티브 HTML 페이지)예요.
 
-세 스킬은 같은 저장소를 **다른 높이**에서 봐요. 해부도는 하늘에서 내려다본 지도, 코드 리더는 한 줄씩 들여다보는 돋보기, 해설서는 면접관 앞에서 펼치는 답안 노트예요.
+네 스킬은 같은 저장소를 **다른 높이**에서 봐요. 해부도는 하늘에서 내려다본 지도, 코드 리더는 한 줄씩 들여다보는 돋보기, 해설서는 면접관 앞에서 펼치는 답안 노트예요. 코드 영화는 코드를 아직 못 읽어도 볼 수 있게, 흐름 하나를 움직이는 그림으로 보여 줘요.
 
 | 스킬 | 보는 높이 | 한 번 보고 나면 | 이렇게 말하면 |
 |---|---|---|---|
 | **codebase-anatomy** | 프로젝트 전체 | "이 프로젝트는 무엇무엇으로 이뤄져 있고, 요청이 이렇게 지나가고, 여기가 위험하다"를 말할 수 있어요 | "이 코드베이스 해부도 만들어줘" |
 | **code-reader** | 줄 하나하나 | 아무 파일이나 열어도 "이 줄은 이걸 하려고 있다"를 말할 수 있어요 | "이 저장소 코드 리더 만들어줘", "코드 리더 업데이트해줘" |
 | **project-haeseolseo** | 결정 하나하나 | "왜 이렇게 만들었어요? 다른 방법은요?"에 근거를 들어 답할 수 있어요 | "이 프로젝트 해설서 만들어줘" |
+| **code-movie** | 흐름 하나 | 버튼 하나를 누르면 값이 앱, 서버, DB 를 어떤 순서로 오가는지 그림으로 말할 수 있어요 | "이 기능 코드 영화로 만들어줘", "애니메이션으로 보여줘" |
 
 ## 어떤 걸 쓸까요?
 
@@ -28,25 +29,28 @@ AI 와 같이 만든 프로젝트는 돌아가긴 하는데, "이 줄이 왜 있
 | "왜 이 기술을 골랐어요?", "다시 만든다면요?" 같은 꼬리 질문이 무섭다 | **project-haeseolseo** — 말하기 연습 |
 | 이력서에 쓴 내용이 실제 코드로 뒷받침되는지 확인하고 싶다 | **project-haeseolseo** — 저장소와 대조 |
 | 팀 프로젝트에서 내가 한 부분과 팀이 한 부분을 갈라 말해야 한다 | **project-haeseolseo** — 내 몫 · 팀 몫 |
+| 코드를 아직 못 읽지만 내 서비스가 어떻게 돌아가는지는 알고 싶다 | **code-movie** |
+| 팀원이나 비개발자에게 기능 하나가 도는 과정을 보여 주고 싶다 | **code-movie** |
 
-**셋 다 쓴다면 이 순서가 좋아요.** 해부도로 큰 그림을 잡고 → 코드 리더로 매일 조금씩 줄 단위로 읽고 → 면접 · 발표 전에 해설서로 말하는 연습을 해요. 위에서 아래로 내려갈수록 자세해져요.
+**여러 개를 쓴다면 이 순서가 좋아요.** 해부도로 큰 그림을 잡고 → 코드 리더로 매일 조금씩 줄 단위로 읽고 → 면접 · 발표 전에 해설서로 말하는 연습을 해요. 위에서 아래로 내려갈수록 자세해져요. 코드가 아직 낯설다면 코드 영화로 중요한 흐름 몇 개를 먼저 보고 시작해도 좋아요.
 
-**이럴 땐 안 써도 돼요.** 파일 몇 개짜리 작은 스크립트라면 Claude 에게 바로 물어보는 편이 빨라요. 세 스킬은 여러 파일 · 여러 기능이 얽힌 저장소에서 제값을 해요.
+**이럴 땐 안 써도 돼요.** 파일 몇 개짜리 작은 스크립트라면 Claude 에게 바로 물어보는 편이 빨라요. 이 스킬들은 여러 파일 · 여러 기능이 얽힌 저장소에서 제값을 해요.
 
-세 스킬 모두 **저장소를 고치지 않고**, 근거(파일:줄)를 달고, 비밀 값(API 키 · 토큰)은 싣지 않아요. 설명은 한국어예요(해부도는 요청한 언어).
+네 스킬 모두 **저장소를 고치지 않고**, 근거(파일:줄)를 달고, 비밀 값(API 키 · 토큰)은 싣지 않아요. 설명은 한국어예요(해부도는 요청한 언어).
 
 ## 결과물은 어디 생기나요?
 
 **결과물은 Claude 의 Artifact 예요.** 스킬을 쓴 사람의 claude.ai 계정에 페이지가 하나 생기고, 처음에는 본인만 볼 수 있어요(공유는 직접 정해요). 이 저장소나 분석한 프로젝트 저장소에는 아무것도 생기지 않아요.
 
-페이지의 원본 파일과 링크는 내 컴퓨터의 **프로젝트마다 폴더 하나**에 모여요. 세 스킬이 같은 폴더를 함께 써요.
+페이지의 원본 파일과 링크는 내 컴퓨터의 **프로젝트마다 폴더 하나**에 모여요. 네 스킬이 같은 폴더를 함께 써요.
 
 ```
 ~/.claude/study-my-code/<프로젝트>/
-  links.json      세 결과물의 Artifact 주소 — 다음에 "업데이트해줘" 하면 여기서 찾아요
+  links.json      결과물의 Artifact 주소 — 다음에 "업데이트해줘" 하면 여기서 찾아요
   code-reader/    코드 리더 작업 폴더 (줄 해설 · 사전 · 흐름 · 기록표)
   haeseolseo/     해설서 원본 HTML
   anatomy/        해부도 원본 HTML
+  movie/          코드 영화 각본(영화마다 JSON 하나)과 만든 페이지
 ```
 
 - **다시 만들면 같은 주소로 갱신돼요.** 읽음 · 체크 · 퀴즈 기록은 그 주소에 묶여 브라우저에 저장되기 때문에, 새 페이지를 만들지 않고 같은 주소를 이어 써요.
@@ -64,10 +68,11 @@ Claude Code 에서:
 /plugin install code-reader@study-my-code
 /plugin install project-haeseolseo@study-my-code
 /plugin install codebase-anatomy@study-my-code
+/plugin install code-movie@study-my-code
 ```
 
 셸에서는 `claude plugin marketplace add toadsam/claude-skills` → `claude plugin install code-reader@study-my-code`.
-필요한 것만 골라 설치해도 돼요. code-reader 는 **Node.js 18+** 가 필요하고, 화면 확인용 스크린샷(`shot.js`)은 Chrome 이나 Edge 가 있으면 써요.
+필요한 것만 골라 설치해도 돼요. code-reader 와 code-movie 는 **Node.js 18+** 가 필요하고, 화면 확인용 스크린샷(`shot.js`)은 Chrome 이나 Edge 가 있으면 써요.
 
 ## code-reader
 
@@ -150,10 +155,36 @@ node engine/smoke.js example/workspace
 - 해설서처럼 내용(장 · 데이터)과 화면 껍데기가 나뉘어 있어서, 예전 해부도도 `node scripts/upgrade.js 해부도.html` 로 새 화면을 입힐 수 있어요.
 - 예시는 [`plugins/codebase-anatomy/skills/codebase-anatomy/example/todo-anatomy.html`](plugins/codebase-anatomy/skills/codebase-anatomy/example/todo-anatomy.html) — 가짜 할 일 앱(TodoBox)의 해부도예요. 경로 · 숫자는 전부 예시예요.
 
+## code-movie
+
+> **언제 열어 볼까요?** 코드를 읽기 전에 "이 버튼을 누르면 무슨 일이 일어나지?"부터 알고 싶을 때, 남에게 기능 하나를 설명해야 할 때, 코드 리더로 읽은 흐름을 그림으로 다시 정리하고 싶을 때.
+
+무대에 앱, 서버, DB, 바깥 서비스 상자를 놓고, 실제 예시 값(입력한 글자, 주문 하나 같은 것)이 카드가 되어 상자 사이를 오가는 영화를 만들어요. 서버 상자를 확대하면 안의 클래스가 방으로 나뉘어 보이고, 카드가 방을 차례로 지나가요.
+
+| 서버 안의 방을 지나가는 장면 | 답장이 화면으로 돌아오는 장면 |
+|---|---|
+| ![서버 안의 방](docs/screenshots/code-movie-room.png) | ![답장](docs/screenshots/code-movie-reply.png) |
+
+- 자막은 코드 용어 없이 쉬운 말로 쓰고, 어려운 말은 눌러서 풀이를 봐요.
+- 장면마다 "이 장면의 진짜 코드"를 펼치면 근거 파일과 줄이 나와요. 이 코드는 빌드할 때 저장소에서 그대로 읽어 넣어요. 손으로 옮겨 적지 않아요.
+- 재생, 멈춤, 속도(0.5×~2×), 장면 타임라인이 있고, 본 장면은 브라우저에 기억돼요.
+- 흐름이 여러 개면 영화를 여러 편 만들어 한 페이지(극장)에 모아요. code-reader 의 흐름 따라가기 이야기가 있으면 그걸 뼈대로 써요.
+- 각본(JSON)만 쓰고 그림 코드는 엔진이 맡아요. `check.js` 가 상자, 카드, 동작, 코드 근거 줄 범위를 검사하고, `smoke.js` 가 화면 없는 Chrome 에서 처음부터 끝까지 재생해 봐요.
+
+예시는 [`plugins/code-movie/skills/code-movie/example/`](plugins/code-movie/skills/code-movie/example) 에 있어요. code-reader 예시와 같은 할 일 앱의 "할 일 추가" 영화(9장면)예요. 직접 만들어 보려면:
+
+```bash
+cd plugins/code-movie/skills/code-movie
+node engine/check.js example/workspace
+node engine/build.js example/workspace
+```
+
+`example/workspace/out/movie.html` 을 브라우저로 열면 돼요.
+
 ## 저장소 구조
 
 ```
-.claude-plugin/marketplace.json     플러그인 3개 목록
+.claude-plugin/marketplace.json     플러그인 4개 목록
 plugins/<이름>/.claude-plugin/plugin.json
 plugins/<이름>/skills/<이름>/SKILL.md   Claude 가 읽는 작업 순서와 규칙
                              references/   자세한 규칙 · 예시

@@ -17,3 +17,7 @@ plugins/codebase-anatomy/skills/codebase-anatomy/example/*.before-shell.html
 node_modules/
 .DS_Store
 Thumbs.db
+# code-movie 예시를 빌드 · 검사할 때 생기는 것
+plugins/code-movie/skills/code-movie/example/workspace/out/
+plugins/code-movie/skills/code-movie/example/workspace/shots/
+plugins/code-movie/skills/code-movie/example/workspace/cr/
