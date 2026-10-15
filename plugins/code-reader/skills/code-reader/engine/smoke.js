@@ -5,7 +5,7 @@ const { fs, path } = L;
 const { ws } = L.loadWs(process.argv[2] || ".");
 const html = fs.readFileSync(path.join(ws, "out", "code-reader.html"), "utf8");
 const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
-const js = scripts[scripts.length - 1][1];
+const js = (scripts.find((m) => m[1].includes("const DATA =")) || scripts[scripts.length - 1])[1]; // 본문 스크립트(실험실 스크립트는 따로 검사)
 function el() {
   return {
     innerHTML: "", textContent: "", hidden: false, checked: true, value: "", style: {}, dataset: {}, scrollTop: 0,

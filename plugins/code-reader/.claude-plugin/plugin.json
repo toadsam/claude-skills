@@ -1,7 +1,7 @@
 {
   "name": "code-reader",
-  "version": "0.2.0",
-  "description": "저장소 코드에 줄마다 한국어 해설을 붙인 인터랙티브 페이지(흐름 따라가기 · 사전 · 연습 · 프로젝트 지도 · 평가)를 만들고, 코드가 바뀌면 바뀐 덩어리만 다시 써요.",
+  "version": "0.3.0",
+  "description": "저장소 코드에 줄마다 한국어 해설을 붙인 인터랙티브 페이지(흐름 따라가기 · 실행 따라가기 · 사전 · 연습 · 프로젝트 지도 · 평가)를 만들고, 코드가 바뀌면 바뀐 덩어리만 다시 써요.",
   "license": "MIT",
   "keywords": ["korean", "code-reading", "learning", "artifact"]
 }

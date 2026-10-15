@@ -12,7 +12,7 @@ description: Build (or incrementally update) a Korean "코드 리더" interactiv
 
 ## 구성
 
-- **엔진** (이 스킬 폴더 `engine/`, 프로젝트와 무관): `template.html`(페이지 전체), `build.js`, `update.js`, `check.js`, `checktour.js`, `outline.js`, `smoke.js`, `shot.js`, `lib.js`
+- **엔진** (이 스킬 폴더 `engine/`, 프로젝트와 무관): `template.html`(페이지 전체), `build.js`, `update.js`, `check.js`, `checktour.js`, `outline.js`, `smoke.js`, `shot.js`, `lib.js`, `labcheck.js` · `lab-engine.html`(실행 따라가기)
 - **작업 폴더** (프로젝트마다 하나, `~/.claude/study-my-code/<프로젝트>/code-reader/` — 아래 「결과물이 남는 곳」): 저장소 밖, 세션이 끝나도 남는다. **저장소 안에는 아무것도 쓰지 않는다.**
 
 ```
@@ -100,6 +100,22 @@ code-reader · project-haeseolseo · codebase-anatomy 세 스킬이 같은 폴�
 ## 페이지 기능 (엔진에 이미 있음 — 데이터만 채우면 된다)
 
 탭 6개, 각 탭은 홈 화면부터: 코드 읽기(흐름 카드 · 파일 칸 · 덩어리 지도 · 줄 해설 · 읽는 방식 3가지 — 📖 해설 보며 / 🙈 먼저 생각하기(해설을 가리고 덩어리마다 「맞혔어요 / 몰랐어요」, 몰랐던 덩어리는 연습에 먼저 나옴) / 🧾 코드만 · 🎯 집중 보기) · 흐름 따라가기(이야기 카드 · 자동 재생 · 파일 지도 · 크게 보기) · 내장 기능 사전(단어 구름 · 묶음 고리 · 알아요 체크) · 연습하기(오늘의 5문제 · 6가지 방식 · 연속 정답) · 프로젝트 지도(구조 그림과 요청 재생 · 배포 단계 재생 · 환경변수 타일 · 데이터 나무 · 커밋 그래프와 시간 재생 · 스크린샷 번호) · 프로젝트 평가(성적표 · 우선순위 표 · 주의 히트맵 · 요청 체크리스트). 자료가 없는 지도 칸 · 성적표는 저절로 숨는다. 진도 · 별표 · 체크는 보는 사람 브라우저(localStorage)에만 남는다.
+
+## 「▶ 실행 따라가기」 (버튼 하나에 어떤 함수가 어떤 순서로 도는지)
+
+화면 파일에 붙인다. 코드 읽기에서 그 파일을 열면 「▶ 실행 따라가기」 버튼이 생기고, 누르면 이벤트(추가하기 · 다음 · 저장 …)를 골라
+**실행 순서도**를 한 칸씩 넘긴다: 👆 누름 → ▶ 함수 들어감(들여쓰기) → • 줄 → ✏️ set(값: 전 → 후, 다음 그리기 때 반영) → ⏸ await(**무엇을 기다리는지 · 그동안 무슨 일**)
+→ 🎨 다시 그리기(바뀐 값) → ⚙️ useEffect → ◀ 돌려줌 → 🏁. 오른쪽에 지금 함수의 진짜 코드(현재 줄), 그 순간의 변수 · 상태(⏳ = 부탁만 한 값), 그 순간의 화면(재현, 바뀐 곳 빨간 테두리).
+핵심은 **함수 호출 순서와 값 변화, 비동기 기다림을 따라가는 것**이다(재현 화면을 직접 만지게 하는 방식은 오히려 어려웠다). 예시: `example/workspace/labs/todolist.*`.
+
+- `labs/<id>.json`: `file`, `sources`(파일 → 보여 줄 줄 범위), `states`(이름 · useState 줄 · 설명), `anchors`(이름 → `{ file?, l, has, body? }` — body 는 함수 몸통 범위),
+  `events[]`: `{ id, icon, title, ui(화면 요소 data-a), intro, start(시작 상태, "$이름" 은 JS examples), steps[] }`.
+  steps 의 k: event · call(fn, args) · line(vars) · set(state, to) · await(what, during) · resume(vars) · return(value) · render(skip?) · effect(fn, deps) · end. 모든 단계에 쉬운 말 `say`.
+  **서버 구간**: 앱이 fetch 를 await 하는 동안(그 사이 render · useEffect 다음, resume 바로 앞)에 `enter` … `leave` 로 서버 코드를 넣는다. 안에서는 call/line/return 그대로, Java 의 막히는 호출(RestTemplate · Firestore `.get()`)은 `block`(what, `ext: true` 면 🌐 바깥 서비스). 기본은 접혀 「서버 안에서 일어난 일 N칸 펼치기」, 「🖥️ 서버까지 같이 보기」로 펼친다. 오른쪽 위에 지금 실행되는 곳(📱 앱 · 🖥️ 서버 · 🌐 바깥).
+  React 순서를 지킨다: set 은 바로 안 바뀌고, 이벤트 함수가 처음 await 에서 멈추거나 끝날 때 한꺼번에 🎨, 그 뒤 deps 가 바뀐 useEffect. 바뀐 값이 없으면 render 에 `skip: true`.
+- `labs/<id>.js`: 화면 그림만 — `LAB.register(id, { init, examples, derive(S), render(S, D, esc) })`, 요소에 `data-a` · `data-name` · `data-dep="상태,…"`.
+- **실행 기록이 아니라 코드를 읽고 따라간 순서**라고 표시한다(머리의 ⓘ). 서버 답 · 사용자 id 같은 값은 예시.
+- 검사: `node <스킬>/engine/labcheck.js <작업폴더>` — anchor 줄의 `has` 글자, useState 줄, call/effect ↔ return 짝, await 뒤 resume. 코드가 바뀌면 여기서 걸린다.
 
 ## 참고 문서
 

@@ -1,0 +1,92 @@
+{
+  "id": "todolist",
+  "icon": "🧭",
+  "title": "할 일 화면 — 실행 따라가기",
+  "file": "web/src/TodoList.tsx",
+  "intro": "버튼을 누르면 어떤 함수가 어떤 순서로 실행되고, 값이 어떻게 바뀌고, 무엇을 기다리는지 한 칸씩 따라가요.",
+  "note": "앱을 실제로 실행해서 기록한 것이 아니라, 코드를 읽고 예시 값(‘빵 사기’)으로 따라간 순서예요. 줄 번호 · 함수 이름은 실제 코드와 검사로 맞췄어요.",
+  "sources": {
+    "web/src/TodoList.tsx": [[4, 37]],
+    "web/src/api.ts": [[11, 19]],
+    "server/src/app.ts": [[13, 19]],
+    "server/src/todoService.ts": [[7, 11]]
+  },
+  "states": [
+    { "name": "todos", "line": 5, "say": "화면에 보이는 할 일 목록" },
+    { "name": "text", "line": 6, "say": "입력칸 글자" },
+    { "name": "error", "line": 7, "say": "빨간 오류 글자" }
+  ],
+  "anchors": {
+    "btnAdd": { "l": [28, 28], "has": "onClick={handleAdd}" },
+    "inputChange": { "l": [27, 27], "has": "onChange={(e) => setText(e.target.value)}" },
+    "hFn": { "l": [13, 13], "has": "async function handleAdd()", "body": [13, 23] },
+    "hTitle": { "l": [14, 14], "has": "const title = text.trim()" },
+    "hGuard": { "l": [15, 15], "has": "if (!title) return" },
+    "hAwait": { "l": [17, 17], "has": "await addTodo(title)" },
+    "hSetTodos": { "l": [18, 18], "has": "setTodos((prev) => [created, ...prev])" },
+    "hSetText": { "l": [19, 19], "has": "setText(\"\")" },
+    "aFn": { "file": "web/src/api.ts", "l": [11, 11], "has": "export async function addTodo", "body": [11, 19] },
+    "aFetch": { "file": "web/src/api.ts", "l": [12, 16], "has": "await fetch(`${BASE_URL}/todos`" },
+    "aOk": { "file": "web/src/api.ts", "l": [17, 17], "has": "if (!res.ok)" },
+    "aJson": { "file": "web/src/api.ts", "l": [18, 18], "has": "return res.json()" },
+    "sPost": { "file": "server/src/app.ts", "l": [13, 13], "has": "app.post(\"/todos\"", "body": [13, 19] },
+    "sTitle": { "file": "server/src/app.ts", "l": [14, 14], "has": "req.body?.title" },
+    "sCheck": { "file": "server/src/app.ts", "l": [15, 17], "has": "title is required" },
+    "sCreate": { "file": "server/src/app.ts", "l": [18, 18], "has": "res.status(201).json(createTodo(title))" },
+    "cFn": { "file": "server/src/todoService.ts", "l": [7, 7], "has": "export function createTodo", "body": [7, 11] },
+    "cMake": { "file": "server/src/todoService.ts", "l": [8, 8], "has": "db.nextId++" },
+    "cPush": { "file": "server/src/todoService.ts", "l": [9, 9], "has": "db.todos.push(todo)" },
+    "cRet": { "file": "server/src/todoService.ts", "l": [10, 10], "has": "return todo" }
+  },
+  "events": [
+    {
+      "id": "add", "icon": "➕", "title": "추가 누르기", "ui": "addBtn",
+      "intro": "화면 함수 handleAdd → 서버를 부르는 addTodo → (서버) → 다시 화면. 기다리는 동안엔 바뀐 값이 없어서 화면이 그대로예요.",
+      "start": { "text": "빵 사기" },
+      "steps": [
+        { "k": "event", "a": "btnAdd", "say": "「추가」 버튼을 눌렀어요. 버튼에 연결된 함수 handleAdd 를 불러요" },
+        { "k": "call", "a": "hFn", "fn": "handleAdd()", "say": "할 일을 추가하는 함수가 시작돼요" },
+        { "k": "line", "a": "hTitle", "say": "입력칸 글자의 앞뒤 빈칸을 떼서 title 에 담아요", "vars": { "title": "\"빵 사기\"" } },
+        { "k": "line", "a": "hGuard", "say": "글자가 비었나? → 아니요, 계속 가요" },
+        { "k": "line", "a": "hAwait", "say": "서버에 추가를 부탁하는 addTodo 를 불러요. await 라서 답이 올 때까지 여기서 멈춰요" },
+        { "k": "call", "a": "aFn", "fn": "addTodo(title)", "args": { "title": "\"빵 사기\"" }, "say": "다른 파일(api.ts)의 함수로 들어왔어요" },
+        { "k": "await", "a": "aFetch", "what": "서버에 POST /todos 를 보내고 답 받기", "say": "fetch 로 서버에 보내고 기다려요(await)", "during": "아래 🖥️ 서버 구간에서 무슨 일이 일어나는지 따라가 볼 수 있어요" },
+        { "k": "render", "skip": true, "say": "기다리는 동안 다시 그릴까요? — 아직 바꿔 달라고 한 값이 없어서 다시 그리지 않아요" },
+        { "k": "enter", "say": "요청이 서버(Express)에 도착했어요. 여기부터는 서버 컴퓨터에서 도는 코드예요", "title": "서버 안에서 일어난 일" },
+        { "k": "call", "a": "sPost", "fn": "app.post(\"/todos\") 처리 함수", "args": { "req.body": "{ title: \"빵 사기\" }" }, "say": "주소가 /todos 인 POST 요청이라 이 함수가 불려요" },
+        { "k": "line", "a": "sTitle", "say": "받은 JSON 에서 title 을 꺼내요", "vars": { "title": "\"빵 사기\"" } },
+        { "k": "line", "a": "sCheck", "say": "글자가 아니거나 비었나? → 아니요 (그랬다면 400 오류로 끝나요)" },
+        { "k": "line", "a": "sCreate", "say": "createTodo 로 할 일을 만들어요" },
+        { "k": "call", "a": "cFn", "fn": "createTodo(title)", "say": "할 일을 만들어 저장하는 함수예요" },
+        { "k": "line", "a": "cMake", "say": "새 번호를 붙이고(nextId 를 하나 올림) 제목은 200자까지만", "vars": { "todo": "{ id: 1, title: \"빵 사기\", done: false }" } },
+        { "k": "line", "a": "cPush", "say": "메모리에 있는 목록(db.todos)에 넣어요 — 예시라 진짜 DB 가 아니에요" },
+        { "k": "return", "a": "cRet", "say": "", "value": "{ id: 1, title: \"빵 사기\", done: false }" },
+        { "k": "line", "a": "sCreate", "say": "201(만들었음) 상태로 새 할 일을 JSON 으로 돌려보내요" },
+        { "k": "return", "a": "sCreate", "say": "", "value": "201 { id: 1, title: \"빵 사기\" }" },
+        { "k": "leave", "say": "응답이 인터넷을 건너 다시 화면으로 돌아가요" },
+        { "k": "resume", "a": "aFetch", "say": "📨 서버 답이 도착했어요. addTodo 가 이어서 실행돼요", "vars": { "res": "응답 (201)" } },
+        { "k": "line", "a": "aOk", "say": "실패인가? → 아니요" },
+        { "k": "await", "a": "aJson", "what": "응답 글자를 객체로 바꾸기", "say": "응답을 객체로 바꾸며 기다려요" },
+        { "k": "resume", "a": "aJson", "say": "다 바뀌었어요" },
+        { "k": "return", "a": "aJson", "say": "", "value": "{ id: 1, title: \"빵 사기\", done: false }" },
+        { "k": "resume", "a": "hAwait", "say": "handleAdd 로 돌아와 이어서 실행해요. 돌려받은 값이 created 에 담겨요", "vars": { "created": "{ id: 1, title: \"빵 사기\" }" } },
+        { "k": "set", "a": "hSetTodos", "state": "todos", "to": "$afterAdd", "say": "새 할 일을 목록 맨 앞에 넣어 달라고 해요 (prev = 지금 목록)" },
+        { "k": "set", "a": "hSetText", "state": "text", "to": "", "say": "입력칸을 비워 달라고 해요" },
+        { "k": "return", "say": "handleAdd 끝" },
+        { "k": "render", "say": "쌓인 부탁(todos · text)을 한꺼번에 반영해 다시 그려요. 목록에 ‘빵 사기’가 생기고 입력칸이 비어요" },
+        { "k": "end", "say": "끝! 함수 2개(화면) + 2개(서버), 기다림 2번, 다시 그리기 1번이었어요" }
+      ]
+    },
+    {
+      "id": "type", "icon": "⌨️", "title": "입력칸에 글자 치기", "ui": "input",
+      "intro": "가장 짧은 흐름이에요.",
+      "start": { "text": "빵" },
+      "steps": [
+        { "k": "event", "a": "inputChange", "say": "입력칸에 ‘ 사기’를 쳤어요. onChange 가 새 글자 전체로 setText 를 불러요" },
+        { "k": "set", "a": "inputChange", "state": "text", "to": "빵 사기", "say": "text 를 \"빵 사기\" 로 바꿔 달라고 해요" },
+        { "k": "render", "say": "다시 그려요. 입력칸이 text 값을 그대로 보여 줘요(value={text})" },
+        { "k": "end", "say": "글자 하나마다 이 세 단계가 되풀이돼요" }
+      ]
+    }
+  ]
+}

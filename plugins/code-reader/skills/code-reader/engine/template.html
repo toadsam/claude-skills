@@ -1435,7 +1435,7 @@ function openFile(file, block, line) {
   f._lineBlock = lineBlock;
   let html = '<div class="fhead"><div class="path">' + esc(f.path || f.file) + (f.offset ? " · " + (f.offset + 1) + "~" + (f.offset + f.lines.length) + "줄만" : "") + '</div><h2>' + esc(f.base) + '</h2><p class="one">' + rich(f.oneLine) + '</p><p class="role">' + rich(f.role) + "</p>" +
     '<div class="rel"><span class="lab">이 파일이 쓰는 것</span>' + relChips(f.calls) + '</div><div class="rel"><span class="lab">이 파일을 쓰는 곳</span>' + relChips(f.calledBy) + "</div></div>";
-  html += '<div class="code-tools"><span class="rd-fprog" id="fileProg"></span>' + readModeBar() + "</div>";
+  html += '<div class="code-tools"><span class="rd-fprog" id="fileProg"></span>' + readModeBar() + (typeof labButton === "function" ? labButton(f) : "") + "</div>";
   html += blockMapHtml(f) + '<div class="blocks-nav" id="blocksNav">' + f.blocks.map((b, i) => '<button type="button" data-b="' + i + '" class="' + (readSet.has(rk(f, i)) ? "read" : "") + '">' + (i + 1) + ". " + esc(b.title) + "</button>").join("") + "</div>";
   html += '<div class="code" id="code">';
   html += codeRows(f, lineBlock, true);
@@ -1445,6 +1445,7 @@ function openFile(file, block, line) {
   center.scrollTop = 0;
   center.querySelectorAll(".chip.link").forEach((c) => c.addEventListener("click", () => openFile(c.dataset.file)));
   center.querySelectorAll(".notetoggle").forEach((x) => x.addEventListener("click", () => setInlineNotes(!inlineNotes)));
+  center.querySelectorAll(".lab-open").forEach((x) => x.addEventListener("click", () => openLab(x.dataset.lab)));
   center.querySelectorAll("[data-rm]").forEach((x) => x.addEventListener("click", () => setReadMode(x.dataset.rm)));
   center.querySelectorAll(".rm-focus").forEach((x) => x.addEventListener("click", () => { focusBlk = !focusBlk; store.set("focusBlk", focusBlk); document.body.classList.toggle("focusblk", focusBlk); x.setAttribute("aria-pressed", focusBlk); }));
   $("#blocksNav").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => selectBlock(+b.dataset.b, null, true)));
@@ -3514,3 +3515,4 @@ openFile(state.file, null, null);
 ixBooting = false;
 showTab(["#gloss", "#tour", "#practice", "#review", "#map"].includes(location.hash) ? location.hash.slice(1) : (["read", "tour", "gloss", "practice", "review", "map"].includes(store.get("tab", "read")) ? store.get("tab", "read") : "read"));
 </script>
+<!--__LABS__-->
