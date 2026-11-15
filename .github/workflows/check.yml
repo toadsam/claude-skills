@@ -18,8 +18,8 @@ jobs:
       matrix:
         node: [20, 22]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: ${{ matrix.node }}
       # 의존성이 없어 npm install 은 하지 않는다. Chrome 은 러너에 깔려 있는 것을 쓴다.
