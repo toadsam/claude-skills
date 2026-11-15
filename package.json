@@ -1,0 +1,11 @@
+{
+  "name": "study-my-code",
+  "private": true,
+  "description": "내 프로젝트를 AI 없이 이해하기 위한 Claude Code 스킬 4종",
+  "license": "MIT",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "test": "node scripts/check-examples.js",
+    "test:no-browser": "node scripts/check-examples.js --no-browser"
+  }
+}

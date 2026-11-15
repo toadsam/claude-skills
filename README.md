@@ -1,5 +1,7 @@
 # study-my-code — 내 프로젝트를 AI 없이 이해하기 위한 Claude Code 스킬
 
+[![check](https://github.com/toadsam/claude-skills/actions/workflows/check.yml/badge.svg)](https://github.com/toadsam/claude-skills/actions/workflows/check.yml)
+
 AI 와 같이 만든 프로젝트는 돌아가긴 하는데, "이 줄이 왜 있어요?"라는 질문에는 막히기 쉬워요.
 이 저장소의 스킬 4개는 **내 저장소의 실제 코드**를 근거로 공부 자료를 만들어 줘요. 결과물은 Claude 의 Artifact(인터랙티브 HTML 페이지)예요.
 
@@ -194,6 +196,25 @@ node engine/build.js example/workspace
 
 `example/workspace/out/movie.html` 을 브라우저로 열면 돼요.
 
+## 검사
+
+스킬마다 결과물을 발행하기 전에 돌리는 검사 스크립트가 있어요. 이 저장소에는 개인 정보 없는 예시(할 일 앱)가 들어 있어서, 그 예시로 네 스킬의 검사를 한 번에 돌릴 수 있어요.
+
+```text
+npm test
+```
+
+설치할 의존성은 없고 Node 20 이상이면 돼요. 코드 영화 재생 검사는 컴퓨터의 Chrome 이나 Edge 를 화면 없이 띄워요. 브라우저가 없으면 `npm run test:no-browser` 로 그 단계만 건너뛸 수 있어요.
+
+| 단계 | 보는 것 |
+|---|---|
+| 문법 · JSON | 저장소의 모든 `.js` 가 문법에 맞는지, 모든 `.json` 이 읽히는지 |
+| code-reader | 해설이 모든 코드 줄을 덮는지, 따라가기 단계와 실행 따라가기가 실제 코드 줄을 가리키는지, 만든 페이지를 가짜 DOM 에서 전부 그려도 오류가 없는지 |
+| code-movie | 각본의 상자 · 동작 · 코드 근거 줄이 엔진과 저장소에 맞는지, Chrome 에서 처음부터 끝까지 재생되는지 |
+| codebase-anatomy · project-haeseolseo | 예시 페이지의 스크립트 문법, 없는 id 를 부르는 곳, 깨진 링크, 남은 `{{ }}` |
+
+GitHub 에 올릴 때마다 같은 명령이 Node 20 · 22 에서 돌아요(`.github/workflows/check.yml`). 검사하는 것은 엔진과 예시가 서로 맞는지까지예요. Claude 가 스킬을 읽고 쓴 해설의 내용이 맞는지는 이 검사로 알 수 없어요.
+
 ## 저장소 구조
 
 ```
@@ -204,6 +225,8 @@ plugins/<이름>/skills/<이름>/SKILL.md   Claude 가 읽는 작업 순서와 �
                              assets/ · engine/ · scripts/   페이지 틀 · 스크립트
                              example/      개인 정보 없는 예시
 docs/screenshots/                   README 사진 (예시 프로젝트로 찍음)
+scripts/check-examples.js           예시로 네 스킬의 검사를 전부 돌린다 (npm test)
+.github/workflows/check.yml         올릴 때마다 같은 검사
 ```
 
 ## 라이선스

@@ -1,0 +1,26 @@
+name: check
+
+# 올릴 때마다 저장소에 든 예제로 네 스킬의 검사 스크립트를 돌린다.
+# 내 컴퓨터에서는 같은 일을 `npm test` 로 한다.
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  examples:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      # 의존성이 없어 npm install 은 하지 않는다. Chrome 은 러너에 깔려 있는 것을 쓴다.
+      - run: npm test
